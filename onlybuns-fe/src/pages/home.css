@@ -19,7 +19,8 @@
   .main-content {
     flex: 1;
     padding: 20px;
-    background-color:#0C2D48;
+
+    /*background-color:#0C2D48;*/
   }
   
   /* Sidebar */
@@ -60,7 +61,7 @@
   
   .username {
     font-size: 24px;
-    color: #00ff00;
+
   }
   
   .nav-menu {
@@ -109,7 +110,6 @@
   
   .caption {
     font-size: 18px;
-    color: #00ff00;
     text-align: center;
     margin-top: 10px;
   }

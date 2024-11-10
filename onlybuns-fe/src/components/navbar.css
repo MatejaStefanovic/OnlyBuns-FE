@@ -1,13 +1,13 @@
 .main-content {
     flex: 1;
-    padding: 20px;
-    background-color:#0C2D48;
+        background-color:#0d2f4b;
+        height: 50px
 }
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color:#145DA0;
+    background-color:#9cb5cc;/*145DA0;*/
     padding: 10px 20px;
     border-radius: 8px;
 }

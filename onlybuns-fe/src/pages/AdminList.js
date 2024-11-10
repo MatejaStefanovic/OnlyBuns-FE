@@ -7,6 +7,9 @@ import rab2 from '../assets/images/rab2.jpg';
 import rab3 from '../assets/images/rab3.jpg';
 import rab4 from '../assets/images/rab4.jpg';
 import sort from '../assets/images/sort.png';
+import NavBar from '../components/navbar';
+import './home.css';
+import SideBar from '../components/sidebar';
 /*const users = [
     { name: 'John', lastName: 'Doe', email: 'john.doe@example.com', numberOfPosts: 5, numberOfFollowings: 10 },
     { name: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', numberOfPosts: 8, numberOfFollowings: 15 },
@@ -20,7 +23,7 @@ import sort from '../assets/images/sort.png';
 const maxNum = 5;
 
 function AdminList() {
-
+    console.log("AdminList rendered");
     const [users, setUsers] = useState([]);
     
     useEffect(() => {
@@ -84,7 +87,9 @@ function AdminList() {
     }
 
     return (
+
         <div className="page">
+                    
             <div className="search">
                 <input
                     placeholder="Search"
