@@ -11,7 +11,7 @@ const NavBar = () => {
       <div className="nav-menu">
         <div className="nav-item"> <Link className="nav-item" to="/profile">PROFILE</Link></div>
         <div className="nav-item">LOG IN</div>
-        
+        <div className="nav-item"> <Link className="nav-item" to="/createPost">CREATE POST</Link></div>
       </div>
     </div>
   </div>
