@@ -16,8 +16,7 @@ function App() {
   
   
     <BrowserRouter>
-          <Route path="admin" element={<AdminList />} />
-             <Route path="createPost" element={<CreatePost />} />
+      
    
       <Routes>
         {/* Wrap routes within Layout */}

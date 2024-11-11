@@ -7,7 +7,7 @@ import rab2 from '../assets/images/rab2.jpg';
 import rab3 from '../assets/images/rab3.jpg';
 import rab4 from '../assets/images/rab4.jpg';
 import sort from '../assets/images/sort.png';
-import NavBar from '../components/navbar';
+import NavBar from '../components/Navbar';
 import './home.css';
 import SideBar from '../components/sidebar';
 /*const users = [

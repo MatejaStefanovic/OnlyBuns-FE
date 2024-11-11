@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import NavBar from './navbar';
+import NavBar from './Navbar';
 import SideBar from './sidebar';
 import AdminList from '../pages/adminList';
 import  './layout.css'
