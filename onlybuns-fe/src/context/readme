@@ -1,5 +1,0 @@
-ChatGPT kao primer daje:
-src/
-└── context/
-    ├── UserContext.js   # Manages user authentication and profile data
-    └── ThemeContext.js  # Manages dark/light theme

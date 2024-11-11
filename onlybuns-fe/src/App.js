@@ -5,6 +5,7 @@ import InboxPage from './pages/inbox/inbox';
 import AnaliticsPage from './pages/analytics/analitics';
 import NearMePage from './pages/postsNearMe';
 import Login from './pages/auth/login/login'
+import SignUp from './pages/auth/registration/signup'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -20,6 +21,7 @@ function App() {
       <Route path="inbox" element={<InboxPage />} />
       <Route path="nearMe" element={<NearMePage />} />
       <Route path="login" element={<Login />} />
+      <Route path="signup" element={<SignUp />} />
     </Routes>
   </BrowserRouter>
   
