@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -25,6 +26,10 @@ function CreatePost() {
   });
 
   const { user } = useUser();
+  if (!user) {
+   
+    return null; 
+  }
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -51,6 +56,7 @@ function CreatePost() {
     fetch('http://localhost:8080/api/post', {
       method: 'POST',
       body: formData,
+    
      
     })
       .then((response) => response.json())
@@ -130,6 +136,7 @@ function CreatePost() {
             onChange={handleImageChange}
             style={{ display: 'none' }}
             id="file-input"
+            required
           />
           <label htmlFor="file-input" className="choose-file-button">Choose File</label>
         </div>
@@ -148,7 +155,7 @@ function CreatePost() {
           <LocationMarker />
         </MapContainer>
       </div>
-      <button type="submit" className="submit-button">Create Post</button>
+      <button type="submit" className="submit-button"  disabled={!image || !coordinates}>Create Post</button>
     </form>
   );
 }

@@ -20,7 +20,6 @@ const NavBar = () => {
             <React.Fragment>
               <div className="nav-item"><Link className="nav-item" to="/login">LOG IN</Link></div>
               <div className="nav-item"><Link className="nav-item" to="/signup">SIGN UP</Link></div>
-              <div className="nav-item"><Link className="nav-item" to="post">CREATE POST</Link></div>
             </React.Fragment>
           )}
         </div>
