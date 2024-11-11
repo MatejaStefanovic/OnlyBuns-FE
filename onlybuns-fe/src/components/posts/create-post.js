@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './create-post.css';
-import rabbitPreview from '../assets/icons/rabbitPreview.png';
+import rabbitPreview from '../../assets/icons/rabbitPreview.png';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({

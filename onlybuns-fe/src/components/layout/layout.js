@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import NavBar from './navbar';
-import SideBar from './sidebar';
-import AdminList from '../pages/adminList';
+import NavBar from '../navbar/navbar';
+import SideBar from '../sidebar/sidebar';
+import AdminList from '../../pages/adminlist/AdminList';
 import  './layout.css'
-import TestComponent from '../pages/test';
+import TestComponent from '../../pages/test';
 
 
 const Layout = () => {

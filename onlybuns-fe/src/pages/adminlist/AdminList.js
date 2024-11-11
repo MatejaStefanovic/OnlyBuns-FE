@@ -1,14 +1,14 @@
 import './AdminList.css';
-import AdminService from '../services/AdminUsersService';
+import AdminService from '../../services/AdminUsersService';
 import { useState, useEffect } from 'react';
-import img from '../assets/images/arrow.jpg';
-import rab1 from '../assets/images/rab1.jpg';
-import rab2 from '../assets/images/rab2.jpg';
-import rab3 from '../assets/images/rab3.jpg';
-import rab4 from '../assets/images/rab4.jpg';
-import sort from '../assets/images/sort.png';
-import './home.css';
-import SideBar from '../components/sidebar';
+import img from '../../assets/images/arrow.jpg';
+import rab1 from '../../assets/images/rab1.jpg';
+import rab2 from '../../assets/images/rab2.jpg';
+import rab3 from '../../assets/images/rab3.jpg';
+import rab4 from '../../assets/images/rab4.jpg';
+import sort from '../../assets/images/sort.png';
+import '../home/home.css';
+import SideBar from '../../components/sidebar/sidebar';
 /*const users = [
     { name: 'John', lastName: 'Doe', email: 'john.doe@example.com', numberOfPosts: 5, numberOfFollowings: 10 },
     { name: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', numberOfPosts: 8, numberOfFollowings: 15 },
