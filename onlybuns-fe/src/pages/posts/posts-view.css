@@ -1,0 +1,95 @@
+.divzaView {
+    background-color: rgb(177, 212, 224);
+    height: 91.2vh;
+    width: 86vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto; 
+    padding: 10px;
+}
+
+.objava {
+    border-radius: 9%;
+    background-color: rgb(223, 235, 245);
+    height: 77%;
+    width: 55%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; 
+}
+
+.photo{
+    width:100%;
+    height: 100%;
+}
+
+.slika{
+    border:2px solid black;
+    height:60%;
+    margin-top:5%;
+    width:90%;
+}
+button{
+    height:6%;
+    border-radius: 50%;
+    border: 0;
+    width:7%;
+    margin-left:86%;
+    margin-top:2%;
+    margin-bottom: -5%;
+}
+.tr{
+    height:100%;
+    width:100%;
+}
+.commentsSection {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    top:50%;
+    position:fixed;
+}
+
+.comment {
+    margin-bottom: 15px;
+}
+.lajkovi{
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width:90%;
+    height:17%;
+}
+
+.lajk{
+    height:90%;
+    
+}
+
+.heartR {
+    height: 80%;
+    width: 70%;
+    background-color: white;
+    mix-blend-mode: multiply;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.icon {
+    height: 80%; 
+    width: auto;
+}
+.opis{
+    height:20%;
+}
+.coment{
+    height: 70%;
+    width: 70%;
+}

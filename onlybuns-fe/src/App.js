@@ -12,6 +12,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminList from './pages/adminlist/AdminList';
 import TestComponent from './pages/test';
+import PostsView from './pages/posts/posts-view';
 function App() {
 
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="post" element={<CreatePost />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<SignUp />} />
+          <Route path="explore" element={<PostsView />} />
         </Route>
     </Routes>
     </BrowserRouter>
