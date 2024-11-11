@@ -1,6 +1,6 @@
 import React from 'react';
-import './home.css';
-import CreatePost from '../components/create-post';
+import '../home/home.css';
+import CreatePost from '../../components/posts/create-post';
 import './create-post.css';
 
 const CreatePostPage = () => {

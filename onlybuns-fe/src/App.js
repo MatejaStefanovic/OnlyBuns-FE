@@ -3,14 +3,14 @@ import HomePage from './pages/home/home'
 import ProfilePage from './pages/user/profile';
 import InboxPage from './pages/inbox/inbox';
 import AnaliticsPage from './pages/analytics/analitics';
-import NearMePage from './pages/postsNearMe';
+import NearMePage from './pages/posts/postsNearMe';
 import Login from './pages/auth/login/login'
 import SignUp from './pages/auth/registration/signup'
-import Layout from './components/layout';
-import CreatePost from './pages/create-post';
+import Layout from './components/layout/layout';
+import CreatePost from './pages/posts/create-post';
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AdminList from './pages/adminList';
+import AdminList from './pages/adminlist/AdminList';
 import TestComponent from './pages/test';
 function App() {
 
