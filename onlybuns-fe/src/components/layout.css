@@ -1,0 +1,7 @@
+.content-area{
+    display: flex;
+    flex-direction: row;
+}
+.navbar{
+    width:80vw;
+}
