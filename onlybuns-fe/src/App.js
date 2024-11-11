@@ -6,26 +6,30 @@ import AnaliticsPage from './pages/analytics/analitics';
 import NearMePage from './pages/postsNearMe';
 import Login from './pages/auth/login/login'
 import SignUp from './pages/auth/registration/signup'
+import Layout from './components/layout';
+import CreatePost from './pages/create-post';
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import AdminList from './pages/adminList';
+import TestComponent from './pages/test';
 function App() {
-  
+
   return (
     <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<HomePage />}>
-      </Route>
-      <Route path="profile" element={<ProfilePage />} />
-      <Route path="analitics" element={<AnaliticsPage />} />
-      <Route path="inbox" element={<InboxPage />} />
-      <Route path="nearMe" element={<NearMePage />} />
-      <Route path="login" element={<Login />} />
-      <Route path="signup" element={<SignUp />} />
-    </Routes>
-  </BrowserRouter>
-  
-  
+      <Routes>
+        <Route path="/" element={<HomePage />}>
+        </Route>
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="analitics" element={<AnaliticsPage />} />
+        <Route path="inbox" element={<InboxPage />} />
+        <Route path="nearMe" element={<NearMePage />} />
+        <Route path="admin" element={<AdminList />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
+      </Routes>
+    </BrowserRouter>
+
+
   );
 }
 

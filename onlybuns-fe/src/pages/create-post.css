@@ -1,0 +1,38 @@
+
+.page-layout {
+    display: flex;
+    height: 85.9vh;
+    width:87vw;
+  }
+  
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #0C2D48;
+    width:100%;
+    height:100%;
+  }
+/*
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #145DA0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width:100%;
+    height:90%;
+  }
+  
+  .content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 20px;
+    width:100%;
+    height:90%;
+  }
+  */
