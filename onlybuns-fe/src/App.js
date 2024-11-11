@@ -12,7 +12,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminList from './pages/adminlist/AdminList';
 import TestComponent from './pages/test';
-import PostsView from './pages/posts/posts-view';
+import PostsView from './pages/postsView/posts-view'
 function App() {
 
   return (

@@ -1,4 +1,4 @@
-import "./posts-view.css";
+import "./posts-view.module.css";
 import red from '../../assets/images/redheart.png';
 import empty from '../../assets/images/emptyheart.png';
 import comm from '../../assets/images/com.png';
@@ -54,7 +54,7 @@ function PostsView() {
         <div className="divzaView">
             {posts.map((post) => (
                 <div key={post.id} className="objava">
-                    <button><img className="tr" src={trash} alt="Trash Icon" /></button>
+                    <button className="bbuton"><img className="tr" src={trash} alt="Trash Icon" /></button>
                     <div className="slika"><img className="photo" src={sl} alt="Nature" /></div>
                     <div className="lajkovi">
                         <p>15</p>
