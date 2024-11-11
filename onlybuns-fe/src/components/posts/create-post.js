@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './create-post.css';
 import rabbitPreview from '../../assets/icons/rabbitPreview.png';
+import { useUser } from '../../context/userContext';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -23,6 +24,8 @@ function CreatePost() {
     street: '',
   });
 
+  const { user } = useUser();
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
@@ -41,10 +44,14 @@ function CreatePost() {
       formData.append('country', location.country);
       formData.append('street', location.street);
     }
+    if (user) {
+      formData.append('email', user.email); // Add user data to formData
+    }
 
     fetch('http://localhost:8080/api/post', {
       method: 'POST',
       body: formData,
+     
     })
       .then((response) => response.json())
       .then((data) => {
