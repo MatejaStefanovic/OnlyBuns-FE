@@ -16,17 +16,18 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />}>
+       <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="analitics" element={<AnaliticsPage />} />
+          <Route path="inbox" element={<InboxPage />} />
+          <Route path="nearMe" element={<NearMePage />} />
+          <Route path="admin" element={<AdminList />} />
+          <Route path="post" element={<CreatePost />} />
+          <Route path="login" element={<Login />} />
+          <Route path="signup" element={<SignUp />} />
         </Route>
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="analitics" element={<AnaliticsPage />} />
-        <Route path="inbox" element={<InboxPage />} />
-        <Route path="nearMe" element={<NearMePage />} />
-        <Route path="admin" element={<AdminList />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<SignUp />} />
-      </Routes>
+    </Routes>
     </BrowserRouter>
 
 
