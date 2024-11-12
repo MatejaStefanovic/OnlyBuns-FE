@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -26,10 +26,12 @@ function CreatePost() {
   });
 
   const { user } = useUser();
-  if (!user) {
+
+  
+  
    
-    return null; 
-  }
+  
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -52,6 +54,7 @@ function CreatePost() {
     if (user) {
       formData.append('email', user.email); // Add user data to formData
     }
+    
 
     fetch('http://localhost:8080/api/post', {
       method: 'POST',
