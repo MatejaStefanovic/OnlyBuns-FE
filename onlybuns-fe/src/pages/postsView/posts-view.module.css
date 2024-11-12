@@ -32,7 +32,11 @@
     margin-top:5%;
     width:90%;
 }
-button{
+.button2{
+    border-radius: 0;
+    height:25%;
+}
+.button{
     height:6%;
     border-radius: 50%;
     border: 0;

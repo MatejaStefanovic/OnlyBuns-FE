@@ -4,11 +4,13 @@ import red from '../../assets/images/redheart.png';
 import empty from '../../assets/images/emptyheart.png';
 import comm from '../../assets/images/com.png';
 import trash from '../../assets/images/trash.png';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/userContext';
 
 function PostsView() {
     const [posts, setPosts] = useState([]);
     const { user } = useUser();
+    const navigate = useNavigate();
     const username = user?.username; 
     async function addComment(postId, commentText) {
         if (!commentText.trim()) return;
@@ -20,6 +22,7 @@ function PostsView() {
     
             setPosts(posts.map(post =>
                 post.id === postId
+
                     ? {
                           ...post,
                           comments: [...post.comments, { description: commentText, user: { username } }],
@@ -56,9 +59,11 @@ function PostsView() {
                 const response = await fetch("http://localhost:8080/api/posts/all");
                 if (!response.ok) throw new Error('Failed to fetch posts');
                 const data = await response.json();
+                //console.log(posts.data.image.imageBase64);
                 const postsWithLikes = data.map(post => ({
                     ...post,
                     isLiked: post.likesList.some(like => like.username === username)
+                    
                 }));
                 setPosts(postsWithLikes); // Set the posts with the isLiked property
             } catch (error) {
@@ -84,7 +89,14 @@ function PostsView() {
         setPosts(posts.map(post =>
             post.id === postId ? { ...post, isLiked: !post.isLiked } : post
         ));
-    }*/async function toggleLike(postId) {
+
+        
+    }*/
+        function editPost(postId) {
+            navigate(`/post`);
+        }
+        
+        async function toggleLike(postId) {
         setPosts(posts.map(post =>
             post.id === postId ? { ...post, isLiked: !post.isLiked } : post
         ));
@@ -130,10 +142,11 @@ function PostsView() {
 
     function toggleComments(postId) {
         setPosts(posts.map(post =>
+          
             post.id === postId ? { ...post, showComments: !post.showComments } : post
         ));
     }
-
+   
     return (
         <div className={styles.divzaView}>
             {posts.map((post) => {
@@ -146,9 +159,19 @@ function PostsView() {
                         )}
                         
                         <div className={styles.slika}>
-                            <img className={styles.photo} 
-                                 src={`data:image/png;base64,${post.image.imageBase64}`} 
-                                 alt="Post image" />
+                        {post.image?.imageBase64 ? (
+                            <img 
+                                className={styles.photo} 
+                                src={`data:image/png;base64,${post.image.imageBase64}`} 
+                                alt="Post image" 
+                            />
+                        ) : (
+                            <img 
+                                className={styles.photo} 
+                                src= {red}
+                                alt="Default image" 
+                            />
+                        )}
                         </div>
                         <p className={styles.p11}>@{post.user?.username}</p>
                         <div className={styles.lajkovi}>
@@ -166,7 +189,11 @@ function PostsView() {
                             <div className={styles.com} onClick={() => toggleComments(post.id)}>
                                 <img src={comm} className={styles.coment} alt="Comment Icon" />
                             </div>
-                          
+                            {post.user?.username === username && (
+                            <button className={styles.button2} onClick={() => editPost(post.id)}>
+                            edit
+                            </button>
+                        )}
                         </div>
                         <div className={styles.opis}>{post.description}</div>
 
