@@ -24,7 +24,11 @@ function CreatePost() {
     street: '',
   });
 
+
   const { user, token } = useUser();
+  if(!user){
+    return null;
+  }
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
