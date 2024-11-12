@@ -1,0 +1,34 @@
+.sidebar {
+    width: 200px;
+    background-color:#145DA0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height:91.2vh;
+    border-right: 1px solid #B1D4E0;
+    overflow-y: hidden;
+  }
+  .logo {
+    color:#B1D4E0;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+  
+  .menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+  
+  .menu-item {
+    font-size: 18px;
+    color: #74BDCB;
+    cursor: pointer;
+  }
+  
+  .menu-item:hover {
+    color: #fff;
+  }
+

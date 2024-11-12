@@ -1,0 +1,7 @@
+ChatGPT kaze kao primer:
+src/
+└── utils/
+    ├── formatters.js    # e.g., date and number formatting functions
+    ├── validators.js    # e.g., email and password validation functions
+    └── apiHelpers.js    # e.g., helper functions for API requests
+
