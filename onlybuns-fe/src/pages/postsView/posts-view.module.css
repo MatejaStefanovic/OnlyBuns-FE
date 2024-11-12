@@ -1,5 +1,5 @@
 .divzaView {
-    background-color: rgb(177, 212, 224);
+    background-color: rgb(126, 160, 177);
     height: 91.2vh;
     width: 86vw;
     display: flex;
@@ -32,7 +32,7 @@
     margin-top:5%;
     width:90%;
 }
-.bbuton{
+button{
     height:6%;
     border-radius: 50%;
     border: 0;

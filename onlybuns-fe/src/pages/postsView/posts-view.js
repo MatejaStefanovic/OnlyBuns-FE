@@ -1,49 +1,81 @@
-import "./posts-view.module.css";
+import { useEffect, useState } from 'react';
+import styles from "./posts-view.module.css";
 import red from '../../assets/images/redheart.png';
 import empty from '../../assets/images/emptyheart.png';
 import comm from '../../assets/images/com.png';
-import sl from '../../assets/images/nature.jpg';
 import trash from '../../assets/images/trash.png';
-import { useState } from 'react';
 
 function PostsView() {
-    const [posts, setPosts] = useState([
-        {
-            id: 1,
-            isLiked: false,
-            showComments: false,
-            comments: [
-                { username: "user1", content: "This is a beautiful photo!" },
-                { username: "user2", content: "Amazing shot!" }
-            ]
-        },
-        {
-            id: 2,
-            isLiked: false,
-            showComments: false,
-            comments: [
-                { username: "user3", content: "Stunning view!" },
-                { username: "user4", content: "Love this place!" }
-            ]
-        },{
-            id: 2,
-            isLiked: false,
-            showComments: false,
-            comments: [
-                { username: "user3", content: "Stunning view!" },
-                { username: "user4", content: "Love this place!" }
-            ]
+    const [posts, setPosts] = useState([]);
+    const username = "lela"; 
+    useEffect(() => {
+        async function fetchPosts() {
+            try {
+                const response = await fetch("http://localhost:8080/api/posts/all");
+                if (!response.ok) throw new Error('Failed to fetch posts');
+                const data = await response.json();
+                setPosts(data);
+                const postsWithLikes = data.map(post => ({
+                    ...post,
+                    isLiked: post.likesList.some(like => like.username === username)
+                }));
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            }
         }
-       
-    ]);
 
-    function toggleLike(postId) {
+        fetchPosts();
+    }, []);
+
+    /*function toggleLike(postId) {
         setPosts(posts.map(post =>
             post.id === postId ? { ...post, isLiked: !post.isLiked } : post
         ));
+    }*/async function toggleLike(postId) {
+        setPosts(posts.map(post =>
+            post.id === postId ? { ...post, isLiked: !post.isLiked } : post
+        ));
+
+        const post = posts.find(p => p.id === postId);
+        const hasLiked = post.isLiked;
+
+        try {
+            if (hasLiked) {
+                // Call removeLike on the backend
+                await fetch(`http://localhost:8080/api/posts/${postId}/removeLike?username=${username}&flag=1`, {
+                    method: 'POST',
+                });
+                setPosts(posts.map(p =>
+                    p.id === postId
+                        ? {
+                              ...p,
+                              numLikes: p.numLikes - 1,
+                              likesList: p.likesList.filter(like => like.username !== username),
+                              isLiked: false,
+                          }
+                        : p
+                ));
+            } else {
+                // Call addLike on the backend
+                await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=-1`, {
+                    method: 'POST',
+                });
+                setPosts(posts.map(p =>
+                    p.id === postId
+                        ? {
+                              ...p,
+                              numLikes: p.numLikes + 1,
+                              likesList: [...p.likesList, { username }],
+                              isLiked: true,
+                          }
+                        : p
+                ));
+            }
+        } catch (error) {
+            console.error("Error toggling like:", error);
+        }
     }
 
-    // Toggle comments visibility for a specific post
     function toggleComments(postId) {
         setPosts(posts.map(post =>
             post.id === postId ? { ...post, showComments: !post.showComments } : post
@@ -51,40 +83,47 @@ function PostsView() {
     }
 
     return (
-        <div className="divzaView">
-            {posts.map((post) => (
-                <div key={post.id} className="objava">
-                    <button className="bbuton"><img className="tr" src={trash} alt="Trash Icon" /></button>
-                    <div className="slika"><img className="photo" src={sl} alt="Nature" /></div>
-                    <div className="lajkovi">
-                        <p>15</p>
-                        <div className="lajk">
-                            <img
-                                id={`myImage-${post.id}`}
-                                className="heartR"
-                                src={post.isLiked ? red : empty}
-                                onClick={() => toggleLike(post.id)}
-                                alt="Heart Icon"
-                            />
+        <div className={styles.divzaView}>
+            {posts.map((post) => {
+                return (
+                    <div key={post.id} className={styles.objava}>
+                        <button className={styles.button}>
+                            <img className={styles.tr} src={trash} alt="Trash Icon" />
+                        </button>
+                        <div className={styles.slika}>
+                            <img className={styles.photo} 
+                                 src={`data:image/png;base64,${post.image.imageBase64}`} 
+                                 alt="Post image" />
                         </div>
-                        <div className="com" onClick={() => toggleComments(post.id)}>
-                            <img src={comm} className="coment" alt="Comment Icon" />
+                        <div className={styles.lajkovi}>
+                            <p>15</p>
+                            <div className={styles.lajk}>
+                                <img
+                                    id={`myImage-${post.id}`}
+                                    className={styles.heartR}
+                                    src={post.isLiked ? red : empty}
+                                    onClick={() => toggleLike(post.id)}
+                                    alt="Heart Icon"
+                                />
+                            </div>
+                            <div className={styles.com} onClick={() => toggleComments(post.id)}>
+                                <img src={comm} className={styles.coment} alt="Comment Icon" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="opis">OVde ide kao opis slikee</div>
+                        <div className={styles.opis}>{post.description}</div>
 
-                    {/* Comments section that appears when showComments is true for the specific post */}
-                    {post.showComments && (
-                        <div className="commentsSection">
-                            {post.comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    <strong>{comment.username}</strong>: {comment.content}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            ))}
+                        {post.showComments && (
+                            <div className={styles.commentsSection}>
+                                {post.comments.map((comment, index) => (
+                                    <div key={index} className={styles.comment}>
+                                        <strong>{comment.description}</strong>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 }
