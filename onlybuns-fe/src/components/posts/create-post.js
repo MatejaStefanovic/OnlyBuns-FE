@@ -25,6 +25,9 @@ function CreatePost() {
   });
 
   const { user } = useUser();
+  if(!user){
+    return null;
+  }
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
