@@ -1,8 +1,9 @@
 
 .page-layout {
     display: flex;
-    height: 85.9vh;
+    height: 91.8vh;
     width:87vw;
+    overflow-y: hidden;
   }
   
 
@@ -11,8 +12,9 @@
     display: flex;
     flex-direction: column;
     background-color: #0C2D48;
-    width:100%;
+    width:98.7%;
     height:100%;
+    overflow-y: hidden;
   }
 /*
   .header {

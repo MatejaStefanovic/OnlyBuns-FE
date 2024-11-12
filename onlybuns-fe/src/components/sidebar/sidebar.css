@@ -4,8 +4,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height:88.7vh;
+    height:91.2vh;
     border-right: 1px solid #B1D4E0;
+    overflow-y: hidden;
   }
   .logo {
     color:#B1D4E0;

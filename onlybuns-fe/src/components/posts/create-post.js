@@ -154,9 +154,10 @@ function CreatePost() {
           <LocationMarker />
         </MapContainer>
       </div>
-      <button type="submit" className="submit-button">Create Post</button>
+      <button type="submit" className="submit-button-for-post">Create Post</button>
     </form>
   );
 }
 
 export default CreatePost;
+

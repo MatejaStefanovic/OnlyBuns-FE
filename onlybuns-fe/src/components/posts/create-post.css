@@ -60,7 +60,7 @@
     background-color: #5593ea;
   }
   
-  .submit-button {
+  .submit-button-for-post {
     background-color: #3a78c4;
     color: #ffffff;
     padding: 10px 20px;
@@ -69,9 +69,12 @@
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s ease;
+    width:100px;
+    height: 50px;
+    margin-right: 80%;
   }
   
-  .submit-button:hover {
+  .submit-button-for-post:hover {
     background-color: #5593ea;
   }
-  
+    
