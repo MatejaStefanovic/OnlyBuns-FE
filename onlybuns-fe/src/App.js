@@ -13,6 +13,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminList from './pages/adminlist/AdminList';
 import TestComponent from './pages/test';
 import PostsView from './pages/postsView/posts-view'
+import EditPost from './pages/editPosts/editPosts';
 function App() {
 
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="explore" element={<PostsView />} />
+          <Route path="edit" element={<EditPost />} />
         </Route>
     </Routes>
     </BrowserRouter>

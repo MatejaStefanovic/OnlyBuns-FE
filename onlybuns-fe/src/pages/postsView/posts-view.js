@@ -19,7 +19,7 @@ function PostsView() {
             await fetch(`http://localhost:8080/api/posts/${postId}/comment?username=${username}&description=${commentText}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+                    'Authorization': `Bearer ${token}`, 
                 }
             });
 
@@ -61,18 +61,18 @@ function PostsView() {
             try {
                 const response = await fetch("http://localhost:8080/api/posts/all", {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+                        'Authorization': `Bearer ${token}`, 
                     }
                 });
                 if (!response.ok) throw new Error('Failed to fetch posts');
                 const data = await response.json();
-                //console.log(posts.data.image.imageBase64);
+
                 const postsWithLikes = data.map(post => ({
                     ...post,
                     isLiked: post.likesList.some(like => like.username === username)
 
                 }));
-                setPosts(postsWithLikes); // Set the posts with the isLiked property
+                setPosts(postsWithLikes); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
@@ -86,7 +86,7 @@ function PostsView() {
             await fetch(`http://localhost:8080/api/posts/${postId}/delete`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+                    'Authorization': `Bearer ${token}`, 
                 }
             });
             setPosts(posts.filter(post => post.id !== postId));
@@ -102,9 +102,9 @@ function PostsView() {
 
         
     }*/
-    function editPost(postId) {
-        navigate(`/post`);
-    }
+        function editPost(post) {
+            navigate(`/edit`, { state: { post } });
+        }
 
     async function toggleLike(postId) {
         setPosts(posts.map(post =>
@@ -120,7 +120,7 @@ function PostsView() {
                 await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=-1`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+                        'Authorization': `Bearer ${token}`, 
                     }
                 });
 
@@ -138,7 +138,7 @@ function PostsView() {
                 await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=1`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+                        'Authorization': `Bearer ${token}`, 
                     }
                 });
                 setPosts(posts.map(p =>
@@ -217,7 +217,7 @@ function PostsView() {
                                
                             </div>
                             {post.user?.username === username && (
-                                <button className={styles.button2} onClick={() => editPost(post.id)}>
+                                <button className={styles.button2} onClick={() => editPost(post)}>
                                     edit
                                 </button>
                             )}
