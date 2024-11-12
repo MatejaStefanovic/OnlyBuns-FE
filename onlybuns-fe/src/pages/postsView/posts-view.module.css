@@ -13,7 +13,7 @@
 .objava {
     border-radius: 9%;
     background-color: rgb(223, 235, 245);
-    height: 77%;
+    height: 79%;
     width: 55%;
     display: flex;
     flex-direction: column;
@@ -46,16 +46,44 @@ button{
     width:100%;
 }
 .commentsSection {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    top:50%;
-    position:fixed;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    z-index: 2;
+}
+.p11{
+    font-size: smaller;
+    color: blue;
+
+}
+.comment {
+    padding: 5px 0;
+    font-size: 14px;
+    color: #333;
+    z-index: 2;
 }
 
-.comment {
-    margin-bottom: 15px;
+.commentForm {
+    display: flex;
+    align-items: center;
+    padding-top: 5px;
+}
+
+.commentInput {
+    flex: 1;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    outline: none;
+}
+
+.commentButton {
+    background: none;
+    border: none;
+    color: #3897f0;
+    font-weight: bold;
+    margin-left: 5px;
+    cursor: pointer;
 }
 .lajkovi{
     display: flex;
