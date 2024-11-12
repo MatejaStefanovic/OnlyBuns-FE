@@ -154,7 +154,7 @@ function CreatePost() {
           <LocationMarker />
         </MapContainer>
       </div>
-      <button type="submit" className="submit-button-for-post">Create Post</button>
+      <button type="submit" disabled={!image || !coordinates || !description}  className="submit-button-for-post">Create Post</button>
     </form>
   );
 }
