@@ -17,7 +17,7 @@ const SideBar = () => {
           <React.Fragment>
             <div className="menu-item"><Link className="menu-item" to="/nearMe">BUNNIES NEAR ME</Link></div>
             <div className="menu-item"><Link className="menu-item" to="/inbox">INBOX</Link></div>
-            <div className="menu-item"><Link className="menu-item" to="/analitics">ANALITICS</Link></div>
+            <div className="menu-item"><Link className="menu-item" to="/analytics">ANALYTICS</Link></div>
             
             {user.role === "ADMIN" && (
               <div className="menu-item"><Link className="menu-item" to="/admin">USERS</Link></div>
