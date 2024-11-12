@@ -2,7 +2,7 @@ import './App.css';
 import HomePage from './pages/home/home'
 import ProfilePage from './pages/user/profile';
 import InboxPage from './pages/inbox/inbox';
-import AnaliticsPage from './pages/analytics/analitics';
+import AnalyticsPage from './pages/analytics/analytics';
 import NearMePage from './pages/posts/postsNearMe';
 import Login from './pages/auth/login/login'
 import SignUp from './pages/auth/registration/signup'
@@ -20,7 +20,7 @@ function App() {
        <Routes>
         <Route path="/" element={<Layout />}>
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="analitics" element={<AnaliticsPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="inbox" element={<InboxPage />} />
           <Route path="nearMe" element={<NearMePage />} />
           <Route path="admin" element={<AdminList />} />

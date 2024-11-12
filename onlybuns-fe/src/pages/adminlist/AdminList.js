@@ -9,6 +9,7 @@ import rab4 from '../../assets/images/rab4.jpg';
 import sort from '../../assets/images/sort.png';
 import '../home/home.css';
 import SideBar from '../../components/sidebar/sidebar';
+import { useUser } from '../../context/userContext'; 
 /*const users = [
     { name: 'John', lastName: 'Doe', email: 'john.doe@example.com', numberOfPosts: 5, numberOfFollowings: 10 },
     { name: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', numberOfPosts: 8, numberOfFollowings: 15 },
@@ -24,11 +25,12 @@ const maxNum = 5;
 function AdminList() {
     console.log("AdminList rendered");
     const [users, setUsers] = useState([]);
-    
+    const { user, token } = useUser();
+
     useEffect(() => {
         const fetchUsers = async () => {
           try {
-            const result = await AdminService.getAll('admin/users');
+            const result = await AdminService.getAll('admin/users', token);
             setUsers(result);
           } catch (error) {
             console.error("Error fetching users", error);
@@ -36,7 +38,7 @@ function AdminList() {
         };
     
         fetchUsers();
-      }, []);
+      }, [token]);
     
     const [searchTerm, setSearchTerm] = useState('');
     const [minPosts, setMinPosts] = useState('');
