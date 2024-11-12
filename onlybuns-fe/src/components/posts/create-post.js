@@ -24,7 +24,7 @@ function CreatePost() {
     street: '',
   });
 
-  const { user } = useUser();
+  const { user, token } = useUser();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -50,8 +50,10 @@ function CreatePost() {
 
     fetch('http://localhost:8080/api/post', {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Include JWT token in Authorization header
+      },
       body: formData,
-     
     })
       .then((response) => response.json())
       .then((data) => {

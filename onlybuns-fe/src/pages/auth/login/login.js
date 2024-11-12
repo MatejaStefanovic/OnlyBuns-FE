@@ -5,14 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const { login } = useUser(); // Iskoristi funkcije iz userContext-a
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password) {
+    if (!email || !password) {
       setError('Please fill in both fields');
       return;
     }
@@ -24,7 +24,7 @@ function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
       // ceka odgovor
       const data = await response.json();
@@ -50,13 +50,13 @@ function Login() {
         {error && <p className="error">{error}</p>}
 
         <div className="inputGroup">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="email">Email</label>
           <input
             type="text"
-            id="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
