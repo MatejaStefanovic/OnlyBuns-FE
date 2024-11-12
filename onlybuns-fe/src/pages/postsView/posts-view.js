@@ -11,7 +11,7 @@ function PostsView() {
     const [posts, setPosts] = useState([]);
     const { user, token } = useUser();
     const navigate = useNavigate();
-    const username = user?.username;
+    const username = user ?.username;
     async function addComment(postId, commentText) {
         if (!commentText.trim()) return;
 
@@ -66,20 +66,23 @@ function PostsView() {
                 });
                 if (!response.ok) throw new Error('Failed to fetch posts');
                 const data = await response.json();
-                //console.log(posts.data.image.imageBase64);
-                const postsWithLikes = data.map(post => ({
-                    ...post,
-                    isLiked: post.likesList.some(like => like.username === username)
 
-                }));
-                setPosts(postsWithLikes); // Set the posts with the isLiked property
+                // Sort posts by creationDateTime in descending order (newest first)
+                const sortedPosts = data
+                    .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
+                    .map(post => ({
+                        ...post,
+                        isLiked: post.likesList.some(like => like.username === username)
+                    }));
+
+                setPosts(sortedPosts); // Set the sorted posts with the isLiked property
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
         }
 
         fetchPosts();
-    }, []);
+    }, [token, username]);
 
     async function deletePost(postId) {
         try {
@@ -169,54 +172,60 @@ function PostsView() {
             {posts.map((post) => {
                 return (
                     <div key={post.id} className={styles.objava}>
-                        {post.user?.username === username && (
+                        {post.user ?.username === username && (
                             <button className={styles.button} onClick={() => deletePost(post.id)}>
                                 <img className={styles.tr} src={trash} alt="Trash Icon" />
                             </button>
                         )}
 
                         <div className={styles.slika}>
-                            {post.image?.imageBase64 ? (
+                            {post.image ?.imageBase64 ? (
                                 <img
                                     className={styles.photo}
                                     src={`data:image/png;base64,${post.image.imageBase64}`}
                                     alt="Post image"
                                 />
                             ) : (
-                                <img
-                                    className={styles.photo}
-                                    src={red}
-                                    alt="Default image"
-                                />
-                            )}
+                                    <img
+                                        className={styles.photo}
+                                        src={red}
+                                        alt="Default image"
+                                    />
+                                )}
                         </div>
-                        <p className={styles.p11}>@{post.user?.username}</p>
+                        <p 
+                            className={styles.p11} 
+                            onClick={() => navigate(`/profile/${post.user?.username}`)}
+                            style={{ cursor: 'pointer' }} // Optional, shows a pointer cursor on hover
+                        >
+                            @{post.user?.username}
+                        </p>
                         <div className={styles.lajkovi}>
 
                             <p>{post.likes}</p>
                             <div className={styles.lajk}>
-                            {user ? (
-                                <img
-                                id={`myImage-${post.id}`}
-                                className={styles.heartR}
-                                src={post.isLiked ? red : empty}
-                                onClick={() => toggleLike(post.id)}
-                                alt="Heart Icon"
-                            />
-                            ) : (
-                            <p></p>
-                            )}
-                              
+                                {user ? (
+                                    <img
+                                        id={`myImage-${post.id}`}
+                                        className={styles.heartR}
+                                        src={post.isLiked ? red : empty}
+                                        onClick={() => toggleLike(post.id)}
+                                        alt="Heart Icon"
+                                    />
+                                ) : (
+                                        <p></p>
+                                    )}
+
                             </div>
                             <div className={styles.com} onClick={() => toggleComments(post.id)}>
-                            {user ? (
-                                 <img src={comm} className={styles.coment} alt="Comment Icon" />
-                            ) : (
-                            <p></p>
-                            )}
-                               
+                                {user ? (
+                                    <img src={comm} className={styles.coment} alt="Comment Icon" />
+                                ) : (
+                                        <p></p>
+                                    )}
+
                             </div>
-                            {post.user?.username === username && (
+                            {post.user ?.username === username && (
                                 <button className={styles.button2} onClick={() => editPost(post.id)}>
                                     edit
                                 </button>
@@ -228,7 +237,7 @@ function PostsView() {
                             <div className={styles.commentsSection}>
                                 {post.comments.map((comment, index) => (
                                     <div key={index} className={styles.comment}>
-                                        <strong>{comment.user?.username}</strong>: {comment.description}
+                                        <strong>{comment.user ?.username}</strong>: {comment.description}
                                     </div>
                                 ))}
                                 <form
