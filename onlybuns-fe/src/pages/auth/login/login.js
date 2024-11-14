@@ -35,7 +35,7 @@ function Login() {
 
         navigate('/');
       } else {
-        setError(data.message || 'Login failed'); 
+        setError(data.error || 'Login failed'); 
       }
     } catch (error) {
       console.error('Login error:', error);
