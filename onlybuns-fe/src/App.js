@@ -14,13 +14,13 @@ import AdminList from './pages/adminlist/AdminList';
 import TestComponent from './pages/test';
 import PostsView from './pages/postsView/posts-view'
 import EditPost from './pages/editPosts/editPosts';
+import LoggedInUserProfile from './pages/user/loggedInUserProfile';
 function App() {
 
   return (
     <BrowserRouter>
        <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="inbox" element={<InboxPage />} />
           <Route path="nearMe" element={<NearMePage />} />
@@ -31,7 +31,9 @@ function App() {
           <Route path="explore" element={<PostsView />} />
           <Route path="edit" element={<EditPost />} />
         </Route>
+        <Route path="profile" element={<LoggedInUserProfile />} />
     </Routes>
+    
     </BrowserRouter>
 
 

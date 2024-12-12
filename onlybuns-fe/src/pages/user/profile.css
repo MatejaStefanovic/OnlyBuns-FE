@@ -1,0 +1,141 @@
+
+
+.user-profile {
+  padding: 1.5rem;
+  background: #2c2c2c;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-family: 'Arial', sans-serif;
+  min-height: 100vh; 
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #00d1ff;
+}
+
+.profile-header p {
+  font-size: 1rem;
+  color: #dddddd;
+}
+
+.profile-section {
+  margin-bottom: 1.5rem;
+}
+
+.profile-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #00d1ff;
+  border-bottom: 2px solid #444;
+  padding-bottom: 0.5rem;
+}
+
+p {
+  margin-bottom: 2.0rem;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background: #1f1f1f;
+  color: #ffffff;
+}
+
+input::placeholder {
+  color: #888888;
+}
+
+button {
+  padding: 0.7rem 1rem;
+  background: #00d1ff;
+  border: none;
+  color: #2c2c2c;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #ffdb4d;
+}
+
+button:not(:last-child) {
+  margin-right: 1rem;
+}
+
+button:disabled {
+  background: #888888;
+  cursor: not-allowed;
+}
+
+.profile-section > div {
+  margin-bottom: 1rem;
+}
+
+.profile-section > div label {
+  color: #dddddd;
+}
+.home-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0.7rem 1rem;
+  background: #00d1ff;
+  border: none;
+  color: #2c2c2c;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.home-button:hover {
+  background: #00d1ff;
+}
+
+.profile-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.profile-info-row label {
+  margin-right: 10px;
+  color: #dddddd;
+  font-weight: bold;
+}
+
+.profile-info-row p {
+  margin-right: 10px;
+}
+
+.profile-info-row input {
+  padding: 0.5rem;
+  border: 1px solid #444;
+  background: #1f1f1f;
+  color: #ffffff;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  min-width: 250px;
+  max-width: 250px;
+}
+
+.profile-info-row input:disabled {
+  background: #333333;
+}
+.edit-btn{
+  margin-bottom: 15px;
+  margin-left: 10px;
+}
