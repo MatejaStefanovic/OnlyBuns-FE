@@ -37,25 +37,6 @@ function PostsView() {
         }
     }
 
-    /*useEffect(() => {
-        async function fetchPosts() {
-            try {
-                const response = await fetch("http://localhost:8080/api/posts/all");
-                if (!response.ok) throw new Error('Failed to fetch posts');
-                const data = await response.json();
-                setPosts(data);
-                const postsWithLikes = data.map(post => ({
-                    ...post,
-                    isLiked: post.likesList.some(like => like.username === username)
-                }));
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
-        }
-
-        fetchPosts();
-    }, []);*/
-
     useEffect(() => {
         async function fetchPosts() {
             try {
@@ -66,23 +47,82 @@ function PostsView() {
                 });
                 if (!response.ok) throw new Error('Failed to fetch posts');
                 const data = await response.json();
-
-                // Sort posts by creationDateTime in descending order (newest first)
+    
+                // Debugging: Log each post's likesList to verify its structure
+                data.forEach(post => {
+                    console.log(`Post ID: ${post.id}, Likes List:`, post.likesList);
+                });
+    
+                // Sort and map posts to include isLiked based on likesList
                 const sortedPosts = data
                     .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
-                    .map(post => ({
-                        ...post,
-                        isLiked: post.likesList.some(like => like.username === username)
-                    }));
-
-                setPosts(sortedPosts); // Set the sorted posts with the isLiked property
+                    .map(post => {
+                        const isLiked = post.likesList?.some(like => like.username === username);
+                        console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
+                        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+                        post.user.followers.forEach(follower => {
+                            console.log(`Follower username: ${follower.username}`);
+                        });
+                        return {
+                            ...post,
+                            isLiked,
+                            isFollowed
+                            };
+                    });
+    
+                setPosts(sortedPosts); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
         }
-
+    
         fetchPosts();
     }, [token, username]);
+    
+    async function followUser(user){
+        try {
+            const response = await fetch(`http://localhost:8080/api/users/follow?usernameFollower=${username}&usernameFollowing=${user.username}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                }
+            });
+
+            if (response.ok) {
+                setPosts(posts.map(post =>
+                post.user.username === user.username
+                    ? { ...post, isFollowed: true }
+                    : post
+                ));
+            } else if (response.status === 429) {
+                const errorMessage = await response.text(); 
+                alert(errorMessage || "You have reached the follow limit. Try again later.");
+            } else {
+                alert("An error occurred while following the user.");
+            }
+          
+        } catch (error) {
+            console.error("Error in follow function:", error);
+        }
+    }
+
+    async function unfollowUser(user){
+        try {
+            await fetch(`http://localhost:8080/api/users/unfollow?usernameFollower=${username}&usernameFollowing=${user.username}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                }
+            });
+            setPosts(posts.map(post =>
+                post.user.username === user.username
+                  ? { ...post, isFollowed: false }
+                  : post
+              ));
+        } catch (error) {
+            console.error("Error in follow function:", error);
+        }
+    }
 
     async function deletePost(postId) {
         try {
@@ -177,7 +217,14 @@ function PostsView() {
                                 <img className={styles.tr} src={trash} alt="Trash Icon" />
                             </button>
                         )}
-
+                        {post.user ?.username != username && (
+                             <button
+                             className={styles.buttonFollow}
+                             onClick={() => (post.isFollowed ? unfollowUser(post.user) : followUser(post.user))}
+                         >
+                             {post.isFollowed ? "Unfollow" : "Follow"}
+                         </button>
+                        )}
                         <div className={styles.slika}>
                             {post.image ?.imageBase64 ? (
                                 <img
@@ -196,7 +243,7 @@ function PostsView() {
                         <p 
                             className={styles.p11} 
                             onClick={() => navigate(`/profile/${post.user?.username}`)}
-                            style={{ cursor: 'pointer' }} // Optional, shows a pointer cursor on hover
+                            style={{ cursor: 'pointer' }} 
                         >
                             @{post.user?.username}
                         </p>
