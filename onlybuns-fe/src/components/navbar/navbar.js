@@ -12,7 +12,7 @@ const NavBar = () => {
         <div className="nav-menu">  
           {user ? (
             <React.Fragment>
-              <div className="nav-item"><Link className="nav-item" to="/profile">PROFILE</Link></div>
+              <div className="nav-item"><Link className="nav-item" to="/myProfile">PROFILE</Link></div>
               <div className="nav-item" onClick={logout}><Link className="nav-item">LOG OUT</Link></div>
               <div className="nav-item"><Link className="nav-item" to="post">CREATE POST</Link></div>
             </React.Fragment>

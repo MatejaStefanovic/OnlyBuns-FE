@@ -37,9 +37,7 @@
   padding-bottom: 0.5rem;
 }
 
-p {
-  margin-bottom: 2.0rem;
-}
+
 
 input[type="text"],
 input[type="password"] {
@@ -72,7 +70,7 @@ button:hover {
 }
 
 button:not(:last-child) {
-  margin-right: 1rem;
+  margin-right: 5rem;
 }
 
 button:disabled {
@@ -127,7 +125,7 @@ button:disabled {
   background: #1f1f1f;
   color: #ffffff;
   border-radius: 5px;
-  margin-bottom: 15px;
+  margin-top:15px;
   min-width: 250px;
   max-width: 250px;
 }

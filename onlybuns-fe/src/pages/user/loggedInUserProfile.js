@@ -16,11 +16,17 @@ L.Icon.Default.mergeOptions({
 });
 
 const CurrentUserProfile = () => {
-  const { user } = useUser();
+  const { user, token } = useUser();
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [activeSection, setActiveSection] = useState('profile');
 
   const [coordinates, setCoordinates] = useState({
     lat: user?.location?.lat || 51.505,
@@ -32,6 +38,7 @@ const CurrentUserProfile = () => {
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
+    followerCount: user?.numberOfFollowing || 0,
   });
 
   const [hasChanges, setHasChanges] = useState(false); // To track changes
@@ -71,41 +78,72 @@ const CurrentUserProfile = () => {
       firstName: user?.firstName,
       lastName: user?.lastName,
       email: user?.email,
+      followerCount: user?.numberOfFollowing,
     };
 
     const isUserInfoChanged =
       userInfo.username !== initialUserInfo.username ||
       userInfo.firstName !== initialUserInfo.firstName ||
-      userInfo.lastName !== initialUserInfo.lastName ||
-      userInfo.email !== initialUserInfo.email;
+      userInfo.lastName !== initialUserInfo.lastName;
 
     setHasChanges(isUserInfoChanged);
+    fetchPosts();
   }, [userInfo, user]);
+  const fetchLocation = async (lat, lng) => {
+    const apiKey = 'f915ad90ad804f96aaea9b30c818d1ab';
+    const response = await fetch(
+      `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
+    );
+    const data = await response.json();
 
- const fetchLocation = async (lat, lng) => {
-  const apiKey = 'f915ad90ad804f96aaea9b30c818d1ab'; 
-  const response = await fetch(
-    `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
-  );
-  const data = await response.json();
-  
-  if (data.results.length > 0) {
-    const components = data.results[0].components;
-    const country = components.country;
-    const city = components.city || components.town || components.village; 
-    const street = components.road || components.neighbourhood;
-    
-    setCoordinates({ lat, lng });
-    setUserInfo((prev) => ({
-      ...prev,
-      location: { country, city, street },
-    }));
-    setIsLocationChanged(true); // Mark location as changed
-  } else {
-    setCoordinates({ lat, lng });
-    setIsLocationChanged(true); // Mark location as changed
-  }
-};
+    if (data.results.length > 0) {
+      const components = data.results[0].components;
+      const country = components.country;
+      const city = components.city || components.town || components.village;
+      const street = components.road || components.neighbourhood;
+
+
+      setCoordinates({ lat, lng });
+      setUserInfo((prev) => ({
+        ...prev,
+        location: { country, city, street },
+      }));
+      setIsLocationChanged(true); // Mark location as changed
+    } else {
+      setCoordinates({ lat, lng });
+      setIsLocationChanged(true); // Mark location as changed
+    }
+  };
+
+  const fetchPosts = async () => {
+    if (!token || !user.email) {
+      setError("Token not available");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/post/userPosts?email=${user.email}`, {
+        method: 'GET', // Using GET method for fetching posts
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include the Authorization header if needed
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user posts');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setPosts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   function LocationMarker() {
     useMapEvents({
@@ -118,7 +156,6 @@ const CurrentUserProfile = () => {
       <Marker position={[coordinates.lat, coordinates.lng]}></Marker>
     );
   }
-
   if (!user) return <p>Loading user data...</p>;
 
   return (
@@ -126,84 +163,126 @@ const CurrentUserProfile = () => {
       <div className="profile-header">
         <h1>{user.firstName} {user.lastName}</h1>
         <p>Email: {user.email}</p>
+        <button className="home-button" style={{ marginRight: 22.2 + "rem" }} onClick={() => setActiveSection("profile")}>Profile information</button>
+        <button className="home-button" style={{ marginRight: 9.8 + "rem" }} onClick={() => setActiveSection("following")}>Followers and Following</button>
+        <button className="home-button" onClick={() => setActiveSection("posts")}>Posts</button>
         <button className="home-button" onClick={handleHomeClick}>Home</button>
       </div>
 
-      <div className="profile-section">
-        <h2>Profile Information</h2>
-        
-        {/* Username */}
-        <div className="profile-info-row">
-          <p><b>Username: </b></p>
-          <p>{userInfo.username}</p>
-        </div>
 
-        {/* First Name */}
-        <div className="profile-info-row">
-          <p><b>First Name: </b></p>
-          <p>{userInfo.firstName}</p>
-        </div>
+      {/* Profile Section */}
+      {activeSection === "profile" && (
+        <div className="profile-section">
+          <h2>Profile Information</h2>
 
-        {/* Last Name */}
-        <div className="profile-info-row">
-          <p><b>Last Name: </b></p>
-          <p>{userInfo.lastName}</p>
-        </div>
-
-        {/* Email */}
-        <div className="profile-info-row">
-          <p><b>Email: </b></p>
-          <p>{userInfo.email}</p>
-        </div>
-        {hasChanges && (
-          <button className="save-changes-btn" onClick={handleSaveChanges}>Save Changes</button>
-        )}
-      </div>
-
-      <div className="profile-section">
-        <h2>Change Password</h2>
-        {!isEditingPassword ? (
-          <button onClick={() => setIsEditingPassword(true)}>Change Password</button>
-        ) : (
-          <>
+          {/* Username */}
+          <div className="profile-info-row">
+            <label><b>Username:</b></label>
             <input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              type="text"
+              value={userInfo.username}
+              onChange={(e) => handleInputChange("username", e.target.value)}
             />
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            <button onClick={handlePasswordChange}>Save Password</button>
-            <button onClick={() => setIsEditingPassword(false)}>Cancel</button>
-          </>
-        )}
-      </div>
+          </div>
 
-      <div className="profile-section">
-        <h2>Update Location</h2>
-        <div>
-          <MapContainer
-            center={[coordinates.lat, coordinates.lng]}
-            zoom={13}
-            style={{ height: '300px', width: '100%' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          {/* First Name */}
+          <div className="profile-info-row">
+            <label><b>First Name:</b></label>
+            <input
+              type="text"
+              value={userInfo.firstName}
+              onChange={(e) => handleInputChange("firstName", e.target.value)}
             />
-            <LocationMarker />
-          </MapContainer>
+          </div>
+
+          {/* Last Name */}
+          <div className="profile-info-row">
+            <label><b>Last Name:</b></label>
+            <input
+              type="text"
+              value={userInfo.lastName}
+              onChange={(e) => handleInputChange("lastName", e.target.value)}
+            />
+          </div>
+
+          {/* Email */}
+          <div className="profile-info-row">
+            <label><b>Email:</b></label>
+            <p>{userInfo.email}</p>
+          </div>
+
+          {/* Follower Count */}
+          <div className="profile-info-row">
+            <label><b>Number of followers:</b></label>
+            <p>{userInfo.followerCount}</p>
+          </div>
+
+          {/* Save Changes Button */}
+          {hasChanges && (
+            <button className="save-changes-btn" onClick={handleSaveChanges}>
+              Save Changes
+            </button>
+          )}
+
+          {/* Change Password */}
+          <h2>Change Password</h2>
+          {!isEditingPassword ? (
+            <button onClick={() => setIsEditingPassword(true)}>Change Password</button>
+          ) : (
+            <>
+              <input
+                type="password"
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button onClick={handlePasswordChange}>Save Password</button>
+              <button onClick={() => setIsEditingPassword(false)}>Cancel</button>
+            </>
+          )}
+
+          {/* Update Location */}
+          <h2>Update Location</h2>
+          <div>
+            <MapContainer
+              center={[coordinates.lat, coordinates.lng]}
+              zoom={13}
+              style={{ height: "300px", width: "100%" }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <LocationMarker />
+            </MapContainer>
+          </div>
+          {isLocationChanged && (
+            <button onClick={handleSaveLocation}>Save Location</button>
+          )}
         </div>
-        {/* Show Save Location button only if location was changed */}
-        {isLocationChanged && (
-          <button onClick={handleSaveLocation}>Save Location</button>
-        )}
-      </div>
+      )}
+
+      {/* Posts Section */}
+      {activeSection === "posts" && (
+        <div className="profile-section">
+          <h2>User Posts</h2>
+          <p>Posts will be displayed here...</p>
+        </div>
+      )}
+
+      {/* Followers Section */}
+      {activeSection === "following" && (
+        <div className="profile-section">
+          <h2>Followers and Following</h2>
+          <p>Followers and Following will be displayed here...</p>
+        </div>
+      )}
     </div>
   );
 };
