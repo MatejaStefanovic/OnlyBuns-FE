@@ -12,49 +12,73 @@ function PostsView() {
     const { user, token } = useUser();
     const navigate = useNavigate();
     const username = user ?.username;
+    
+   
+    // async function addComment(postId, commentText) {
+    //     if (!commentText.trim()) return;
+
+    //     try {
+    //         await fetch(`http://localhost:8080/api/posts/${postId}/comment?username=${username}&description=${commentText}`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`, 
+    //             }
+    //         });
+
+    //         setPosts(posts.map(post =>
+    //             post.id === postId
+
+    //                 ? {
+    //                     ...post,
+    //                     comments: [...post.comments, { description: commentText, user: { username } }],
+    //                 }
+    //                 : post
+    //         ));
+    //     } catch (error) {
+    //         console.error("Error adding comment:", error);
+    //     }
+    // }
     async function addComment(postId, commentText) {
         if (!commentText.trim()) return;
-
+    
         try {
-            await fetch(`http://localhost:8080/api/posts/${postId}/comment?username=${username}&description=${commentText}`, {
+            const response = await fetch(`http://localhost:8080/api/posts/${postId}/comment?username=${username}&description=${commentText}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`, 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
-
+    
+            if (response.status === 403) {
+                alert("You have exceeded the comment limit for the last hour.");
+                return;
+            }
+    
+            if (response.status === 404) {
+                alert("Post or user not found.");
+                return;
+            }
+    
+            if (!response.ok) throw new Error('Failed to add comment');
+    
+            const updatedPost = await response.json();
+    
+            // Ažuriramo stanje sa vraćenim postom
             setPosts(posts.map(post =>
-                post.id === postId
-
-                    ? {
-                        ...post,
-                        comments: [...post.comments, { description: commentText, user: { username } }],
-                    }
-                    : post
-            ));
+                            post.id === postId
+            
+                                 ? {
+                                     ...post,
+                                    comments: [...post.comments, { description: commentText, user: { username } }],
+                                 }
+                                 : post
+        ));
         } catch (error) {
             console.error("Error adding comment:", error);
         }
     }
-
-    /*useEffect(() => {
-        async function fetchPosts() {
-            try {
-                const response = await fetch("http://localhost:8080/api/posts/all");
-                if (!response.ok) throw new Error('Failed to fetch posts');
-                const data = await response.json();
-                setPosts(data);
-                const postsWithLikes = data.map(post => ({
-                    ...post,
-                    isLiked: post.likesList.some(like => like.username === username)
-                }));
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
-        }
-
-        fetchPosts();
-    }, []);*/
+    
 
     useEffect(() => {
         async function fetchPosts() {
@@ -66,23 +90,82 @@ function PostsView() {
                 });
                 if (!response.ok) throw new Error('Failed to fetch posts');
                 const data = await response.json();
-
-                // Sort posts by creationDateTime in descending order (newest first)
+    
+                // Debugging: Log each post's likesList to verify its structure
+                data.forEach(post => {
+                    console.log(`Post ID: ${post.id}, Likes List:`, post.likesList);
+                });
+    
+                // Sort and map posts to include isLiked based on likesList
                 const sortedPosts = data
                     .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
-                    .map(post => ({
-                        ...post,
-                        isLiked: post.likesList.some(like => like.username === username)
-                    }));
-
-                setPosts(sortedPosts); // Set the sorted posts with the isLiked property
+                    .map(post => {
+                        const isLiked = post.likesList?.some(like => like.user.username === username);
+                        console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
+                        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+                        post.user.followers.forEach(follower => {
+                            console.log(`Follower username: ${follower.username}`);
+                        });
+                        return {
+                            ...post,
+                            isLiked,
+                            isFollowed
+                            };
+                    });
+    
+                setPosts(sortedPosts); 
             } catch (error) {
                 console.error("Error fetching posts:", error);
             }
         }
-
+    
         fetchPosts();
     }, [token, username]);
+    
+    async function followUser(user){
+        try {
+            const response = await fetch(`http://localhost:8080/api/users/follow?usernameFollower=${username}&usernameFollowing=${user.username}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                }
+            });
+
+            if (response.ok) {
+                setPosts(posts.map(post =>
+                post.user.username === user.username
+                    ? { ...post, isFollowed: true }
+                    : post
+                ));
+            } else if (response.status === 429) {
+                const errorMessage = await response.text(); 
+                alert(errorMessage || "You have reached the follow limit. Try again later.");
+            } else {
+                alert("An error occurred while following the user.");
+            }
+          
+        } catch (error) {
+            console.error("Error in follow function:", error);
+        }
+    }
+
+    async function unfollowUser(user){
+        try {
+            await fetch(`http://localhost:8080/api/users/unfollow?usernameFollower=${username}&usernameFollowing=${user.username}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                }
+            });
+            setPosts(posts.map(post =>
+                post.user.username === user.username
+                  ? { ...post, isFollowed: false }
+                  : post
+              ));
+        } catch (error) {
+            console.error("Error in follow function:", error);
+        }
+    }
 
     async function deletePost(postId) {
         try {
@@ -109,56 +192,103 @@ function PostsView() {
             navigate(`/edit`, { state: { post } });
         }
 
-    async function toggleLike(postId) {
-        setPosts(posts.map(post =>
-            post.id === postId ? { ...post, isLiked: !post.isLiked } : post
-        ));
+    // async function toggleLike(postId) {
+    //     setPosts(posts.map(post =>
+    //         post.id === postId ? { ...post, isLiked: !post.isLiked } : post
+    //     ));
 
+    //     const post = posts.find(p => p.id === postId);
+    //     const hasLiked = post.isLiked;
+
+    //     try {
+    //         if (hasLiked) {
+
+    //             await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=-1`, {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Authorization': `Bearer ${token}`, 
+    //                 }
+    //             });
+
+    //             setPosts(posts.map(p =>
+    //                 p.id === postId
+    //                     ? {
+    //                         ...p,
+    //                         likes: p.likes - 1,
+    //                         likesList: p.likesList.filter(like => like.username !== username),
+    //                         isLiked: false,
+    //                     }
+    //                     : p
+    //             ));
+    //         } else {
+    //             await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=1`, {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Authorization': `Bearer ${token}`, 
+    //                 }
+    //             });
+    //             setPosts(posts.map(p =>
+    //                 p.id === postId
+    //                     ? {
+    //                         ...p,
+    //                         likes: p.likes + 1,
+    //                         likesList: [...p.likesList, { username }],
+    //                         isLiked: true,
+    //                     }
+    //                     : p
+    //             ));
+    //         }
+    //     } catch (error) {
+    //         console.error("Error toggling like:", error);
+    //     }
+    // }
+
+    async function toggleLike(postId) {
+        // Pronađi post iz stanja
         const post = posts.find(p => p.id === postId);
         const hasLiked = post.isLiked;
-
+        const flag = hasLiked ? -1 : 1;
+       
         try {
-            if (hasLiked) {
-
-                await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=-1`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`, 
-                    }
-                });
-
-                setPosts(posts.map(p =>
-                    p.id === postId
-                        ? {
-                            ...p,
-                            likes: p.likes - 1,
-                            likesList: p.likesList.filter(like => like.username !== username),
-                            isLiked: false,
-                        }
-                        : p
-                ));
+          // Pošalji zahtev backend-u
+          
+          const response = await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=${flag}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+      
+          if (!response.ok) {
+            // Prikaz poruka za greške
+            if (response.status === 400) {
+              alert("You cannot like or unlike this post due to invalid conditions.");
             } else {
-                await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=1`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`, 
-                    }
-                });
-                setPosts(posts.map(p =>
-                    p.id === postId
-                        ? {
-                            ...p,
-                            likes: p.likes + 1,
-                            likesList: [...p.likesList, { username }],
-                            isLiked: true,
-                        }
-                        : p
-                ));
+              alert("An error occurred while processing your request.");
             }
+            throw new Error("Failed to toggle like");
+          }
+      
+          // Dobij ažurirani post sa backend-a
+          const updatedPost = await response.json();
+      
+          // Proveri da li je korisnik lajkovao post
+        const isLiked = updatedPost.likesList.some(like => like.user.username === username);
+      
+          // Ažuriraj stanje sa ispravnom vrednošću `isLiked`
+          setPosts(posts.map(p => 
+            p.id === postId 
+              ? { ...updatedPost, isLiked } // Dodaj `isLiked` bazirano na `likesList`
+              : p
+          ));
         } catch (error) {
-            console.error("Error toggling like:", error);
+          console.error("Error toggling like:", error);
         }
-    }
+      }
+      
+      
+    
 
     function toggleComments(postId) {
         setPosts(posts.map(post =>
@@ -177,7 +307,14 @@ function PostsView() {
                                 <img className={styles.tr} src={trash} alt="Trash Icon" />
                             </button>
                         )}
-
+                        {post.user ?.username != username && (
+                             <button
+                             className={styles.buttonFollow}
+                             onClick={() => (post.isFollowed ? unfollowUser(post.user) : followUser(post.user))}
+                         >
+                             {post.isFollowed ? "Unfollow" : "Follow"}
+                         </button>
+                        )}
                         <div className={styles.slika}>
                             {post.image ?.imageBase64 ? (
                                 <img
@@ -196,7 +333,7 @@ function PostsView() {
                         <p 
                             className={styles.p11} 
                             onClick={() => navigate(`/profile/${post.user?.username}`)}
-                            style={{ cursor: 'pointer' }} // Optional, shows a pointer cursor on hover
+                            style={{ cursor: 'pointer' }} 
                         >
                             @{post.user?.username}
                         </p>
@@ -206,12 +343,13 @@ function PostsView() {
                             <div className={styles.lajk}>
                                 {user ? (
                                     <img
-                                        id={`myImage-${post.id}`}
-                                        className={styles.heartR}
-                                        src={post.isLiked ? red : empty}
-                                        onClick={() => toggleLike(post.id)}
-                                        alt="Heart Icon"
-                                    />
+                                    id={`myImage-${post.id}`}
+                                    className={styles.heartR}
+                                    src={post.isLiked ? red : empty} // Menja se na osnovu `post.isLiked`
+                                    onClick={() => toggleLike(post.id)}
+                                    alt="Heart Icon"
+                                  />
+                                  
                                 ) : (
                                         <p></p>
                                     )}

@@ -13,7 +13,7 @@
 .objava {
     border-radius: 9%;
     background-color: rgb(223, 235, 245);
-    height: 79%;
+    height: 89%;
     width: 55%;
     display: flex;
     flex-direction: column;
@@ -124,4 +124,18 @@
 .coment{
     height: 70%;
     width: 70%;
+}
+
+.buttonFollow{
+    border-radius: 10%;
+    background-color: #ddd;
+    color:#333;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin-left:80%;
+    margin-top:2%;
+    margin-bottom: -4%;
+}
+.buttonFollow:hover{
+    background-color: #7d7b88;
+    border-radius: 8%;
 }
