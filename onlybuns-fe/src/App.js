@@ -31,7 +31,8 @@ function App() {
           <Route path="explore" element={<PostsView />} />
           <Route path="edit" element={<EditPost />} />
         </Route>
-        <Route path="profile" element={<LoggedInUserProfile />} />
+        <Route path="myProfile" element={<LoggedInUserProfile />} />
+        <Route path="/profile/:username" element={<ProfilePage />} />
     </Routes>
     
     </BrowserRouter>
