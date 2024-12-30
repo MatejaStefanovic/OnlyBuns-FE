@@ -10,7 +10,7 @@ const HomePage = () => {
     <div className="container">
       <NavBar />
       <SideBar />
- 
+    <div className="jedan"></div>
     </div>
   );
 };
