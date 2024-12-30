@@ -17,23 +17,32 @@ L.Icon.Default.mergeOptions({
 
 const ProfilePage = () => {
   const { username } = useParams(); // Extract username from the route
-  const { user: contextUser } = useUser(); // Get user from context if available
+  const { user: contextUser, token } = useUser(); // Get user from context if available
   const navigate = useNavigate();
-
+  const [isFollowed, setIsFollowed] = useState();
   const [user, setUser] = useState(contextUser || null); // State for user data
   const [loading, setLoading] = useState(!contextUser); // Skip loading if user is available in context
   const [error, setError] = useState(null); // Error state
-
+  const [userr, setUserr] = useState(null); 
   useEffect(() => {
       // Fetch user data dynamically if not in context
       const fetchUserData = async () => {
         try {
+          console.log(`Follower username: ${contextUser.username}`);
+          console.log("Following username:", username);
+         
           setLoading(true);
           const response = await fetch(
-            `http://localhost:8080/api/users/findUser?username=${username}` // Replace with your API endpoint
+            `http://localhost:8080/api/users/findUser?username=${username}`
+            //  // Replace with your API endpoint
+           
+
           );
-          if (!response.ok) throw new Error('User not found');
+          if (!response.ok) throw new Error('User not found');         
           const data = await response.json();
+         
+          setUserr(data);
+          //console.log("Followers: ",userr.followers);
           if(data.email === contextUser.email)
             navigate("/myProfile");
           setUser(data); // Set fetched user data
@@ -47,7 +56,59 @@ const ProfilePage = () => {
       fetchUserData();
     
   }, [contextUser, username]);
+  useEffect(() => {
+    if (userr) {
+      setIsFollowed(
+        userr?.followers?.some(follower => contextUser.username === follower.username) 
+      );
+      console.log("Updated Userr:", userr);
+      console.log("Followers:", userr.followers);
+    }
+  }, [userr]);
 
+  useEffect(() => {
+    if (userr) {
+     console.log("bool:", isFollowed);
+    }
+  }, [isFollowed]);
+  async function followUser(){
+    try {
+        const response = await fetch(`http://localhost:8080/api/users/follow?usernameFollower=${contextUser.username}&usernameFollowing=${username}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`, 
+            }
+        });
+
+        if (response.ok) {
+          setIsFollowed(true); 
+
+        } else if (response.status === 429) {
+            const errorMessage = await response.text(); 
+            alert(errorMessage || "You have reached the follow limit. Try again later.");
+        } else {
+            alert("An error occurred while following the user.");
+        }
+      
+    } catch (error) {
+        console.error("Error in follow function:", error);
+    }
+}
+
+async function unfollowUser(){
+    try {
+        await fetch(`http://localhost:8080/api/users/unfollow?usernameFollower=${contextUser.username}&usernameFollowing=${username}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`, 
+            }
+        });
+        setIsFollowed(false); 
+         
+    } catch (error) {
+        console.error("Error in follow function:", error);
+    }
+}
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -55,6 +116,7 @@ const ProfilePage = () => {
 
   return (
     <div className="user-profile">
+    <button className="follow-button"  onClick={() => (isFollowed ? unfollowUser() : followUser())}>  {isFollowed ? "Unfollow" : "Follow"}</button>
       <div className="profile-header">
         <h1>{userData.firstName} {userData.lastName}</h1>
         <p>Email: {userData.email}</p>
