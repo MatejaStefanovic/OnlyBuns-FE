@@ -29,16 +29,16 @@ const CurrentUserProfile = () => {
   const [activeSection, setActiveSection] = useState('profile');
 
   const [coordinates, setCoordinates] = useState({
-    lat: user?.location?.lat || 51.505,
-    lng: user?.location?.lng || -0.09,
+    lat: user ?.location ?.lat || 51.505,
+    lng: user ?.location ?.lng || -0.09,
   });
 
   const [userInfo, setUserInfo] = useState({
-    username: user?.username || '',
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    followerCount: user?.numberOfFollowing || 0,
+    username: user ?.username || '',
+    firstName: user ?.firstName || '',
+    lastName: user ?.lastName || '',
+    email: user ?.email || '',
+    followerCount: user ?.numberOfFollowing || 0,
   });
 
   const [hasChanges, setHasChanges] = useState(false); // To track changes
@@ -74,11 +74,11 @@ const CurrentUserProfile = () => {
 
   useEffect(() => {
     const initialUserInfo = {
-      username: user?.username,
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      email: user?.email,
-      followerCount: user?.numberOfFollowing,
+      username: user ?.username,
+      firstName: user ?.firstName,
+      lastName: user ?.lastName,
+      email: user ?.email,
+      followerCount: user ?.numberOfFollowing,
     };
 
     const isUserInfoChanged =
@@ -124,6 +124,7 @@ const CurrentUserProfile = () => {
     setError(null);
 
     try {
+      console.log(user.email)
       const response = await fetch(`http://localhost:8080/api/post/userPosts?email=${user.email}`, {
         method: 'GET', // Using GET method for fetching posts
         headers: {
@@ -271,10 +272,44 @@ const CurrentUserProfile = () => {
       {/* Posts Section */}
       {activeSection === "posts" && (
         <div className="profile-section">
-          <h2>User Posts</h2>
-          <p>Posts will be displayed here...</p>
+          <h2 className="section-title">User Posts</h2>
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.id} className="post-card">
+                <div className="post-header">
+                  <h3 className="post-title">{post.description}</h3>
+                  <p className="post-date">
+                    <strong>Created On:</strong> {new Date(post.creationDateTime).toLocaleString()}
+                  </p>
+                </div>
+                {post.image && (
+                  <div className="post-image">
+                    <img
+                      src={`data:image/jpeg;base64,${post.image.imageBase64}`}
+                      alt={post.image.relativePath}
+                    />
+                  </div>
+                )}
+                <div className="post-details">
+                  <p>
+                    <strong>Location:</strong> {post.location.city}, {post.location.street},{" "}
+                    {post.location.country}
+                  </p>
+                  <p>
+                    <strong>Likes:</strong> {post.likes}
+                  </p>
+                  <p>
+                    <strong>Comments:</strong> {post.comments.length}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-posts">No posts available...</p>
+          )}
         </div>
       )}
+      
 
       {/* Followers Section */}
       {activeSection === "following" && (
