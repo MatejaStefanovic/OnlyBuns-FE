@@ -18,9 +18,9 @@
 .rabbit {
     width: 100vw; 
     height: 100%;
-    opacity: 0; 
+    opacity: 100; 
     animation: fadeInOut 5s  infinite;
-    background-color: rgb(61, 141, 175);
+    background: #2c2c2c;
     color: rgb(61, 141, 175);
     mix-blend-mode: multiply;
 }
@@ -51,7 +51,7 @@
  .page{
     height:91.2vh;
     width:87vw;
-    background-color: rgb(177, 212, 224);
+    background: #2c2c2c;
     position:relative;
   }
 .center-container {
