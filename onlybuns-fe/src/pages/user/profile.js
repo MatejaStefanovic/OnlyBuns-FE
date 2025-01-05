@@ -17,83 +17,106 @@ L.Icon.Default.mergeOptions({
 
 const ProfilePage = () => {
   const { username } = useParams(); // Extract username from the route
-  const { user: contextUser, token } = useUser(); // Get user from context if available
+  const { user: contextUser, token } = useUser(); // Get user from context
   const navigate = useNavigate();
-  const [isFollowed, setIsFollowed] = useState();
-  const [user, setUser] = useState(contextUser || null); // State for user data
-  const [loading, setLoading] = useState(!contextUser); // Skip loading if user is available in context
-  const [error, setError] = useState(null); // Error state
-  const [userr, setUserr] = useState(null); 
+
+  const [user, setUser] = useState(contextUser || null);
+  const [userr, setUserr] = useState(null);
+  const [loading, setLoading] = useState(!contextUser);
+  const [error, setError] = useState(null);
+  const [activeSection, setActiveSection] = useState('profile');
+  const [posts, setPosts] = useState([]);
+  const [isFollowed, setIsFollowed] = useState(false);
+
   useEffect(() => {
-      // Fetch user data dynamically if not in context
-      const fetchUserData = async () => {
-        try {
-          console.log(`Follower username: ${contextUser.username}`);
-          console.log("Following username:", username);
-         
-          setLoading(true);
-          const response = await fetch(
-            `http://localhost:8080/api/users/findUser?username=${username}`
-            //  // Replace with your API endpoint
-           
+    // Fetch user data dynamically if not in context
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8080/api/users/findUser?username=${username}`);
+        if (!response.ok) throw new Error('User not found');
+        const data = await response.json();
 
-          );
-          if (!response.ok) throw new Error('User not found');         
-          const data = await response.json();
-         
-          setUserr(data);
-          //console.log("Followers: ",userr.followers);
-          if(data.email === contextUser.email)
-            navigate("/myProfile");
-          setUser(data); // Set fetched user data
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
+        setUserr(data);
+
+        if (data.email === contextUser.email) {
+          navigate('/myProfile');
+        } else {
+          setUser(data);
         }
-      };
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (!contextUser || contextUser.username !== username) {
       fetchUserData();
-    
-  }, [contextUser, username]);
+    } else {
+      setUser(contextUser);
+    }
+  }, [contextUser, username, navigate]);
+
   useEffect(() => {
     if (userr) {
       setIsFollowed(
-        userr?.followers?.some(follower => contextUser.username === follower.username) 
+        userr?.followers?.some((follower) => contextUser.username === follower.username)
       );
-      console.log("Updated Userr:", userr);
-      console.log("Followers:", userr.followers);
     }
-  }, [userr]);
+  }, [userr, contextUser.username]);
 
   useEffect(() => {
-    if (userr) {
-     console.log("bool:", isFollowed);
-    }
-  }, [isFollowed]);
-  async function followUser(){
-    try {
-        const response = await fetch(`http://localhost:8080/api/users/follow?usernameFollower=${contextUser.username}&usernameFollowing=${username}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`, 
-            }
+    const fetchPosts = async () => {
+      if (!token || !user?.email) {
+        setError('Token not available');
+        return;
+      }
+      setLoading(true);
+
+      try {
+        const response = await fetch(`http://localhost:8080/api/post/userPosts?email=${user.email}`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (response.ok) {
-          setIsFollowed(true); 
+        if (!response.ok) throw new Error('Failed to fetch user posts');
 
-        } else if (response.status === 429) {
-            const errorMessage = await response.text(); 
-            alert(errorMessage || "You have reached the follow limit. Try again later.");
-        } else {
-            alert("An error occurred while following the user.");
+        const data = await response.json();
+        setPosts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) fetchPosts();
+  }, [user, token]);
+
+  const followUser = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/users/follow?usernameFollower=${contextUser.username}&usernameFollowing=${username}`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` },
         }
-      
+      );
+
+      if (response.ok) {
+        setIsFollowed(true);
+      } else if (response.status === 429) {
+        const errorMessage = await response.text();
+        alert(errorMessage || 'You have reached the follow limit. Try again later.');
+      } else {
+        alert('An error occurred while following the user.');
+      }
     } catch (error) {
-        console.error("Error in follow function:", error);
+      console.error('Error in follow function:', error);
     }
-}
+  };
+
 
 async function unfollowUser(){
     try {
@@ -109,6 +132,7 @@ async function unfollowUser(){
         console.error("Error in follow function:", error);
     }
 }
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -120,51 +144,107 @@ async function unfollowUser(){
       <div className="profile-header">
         <h1>{userData.firstName} {userData.lastName}</h1>
         <p>Email: {userData.email}</p>
-        <button className="home-button" style={{marginRight: 9.8 + "rem"}} onClick={() => navigate('/')}>Followers and Following</button>
-        <button className="home-button" onClick={() => navigate('/')}>Posts</button>
+        <button className="home-button" style={{ marginRight: 22.2 + "rem" }} onClick={() => setActiveSection("profile")}>Profile information</button>
+        <button className="home-button" style={{ marginRight: 9.8 + "rem" }} onClick={() => setActiveSection("following")}>Followers and Following</button>
+        <button className="home-button" onClick={() => setActiveSection("posts")}>Posts</button>
         <button className="home-button" onClick={() => navigate('/')}>Home</button>
       </div>
 
-      <div className="profile-section">
-        <h2>Profile Information</h2>
-        <div className="profile-info-row">
-          <label><b>Username:</b></label>
-          <p>{userData.username}</p>
+      {activeSection === "profile" && (
+        <>
+        <div className="profile-section">
+          <h2>Profile Information</h2>
+          <div className="profile-info-row">
+            <label><b>Username:</b></label>
+            <p>{userData.username}</p>
+          </div>
+          <div className="profile-info-row">
+            <label><b>First Name:</b></label>
+            <p>{userData.firstName}</p>
+          </div>
+          <div className="profile-info-row">
+            <label><b>Last Name:</b></label>
+            <p>{userData.lastName}</p>
+          </div>
+          <div className="profile-info-row">
+            <label><b>Email:</b></label>
+            <p>{userData.email}</p>
+          </div>
+          <div className="profile-info-row">
+            <label><b>Number of followers:</b></label>
+            <p>{userData.numberOfFollowing}</p>
+          </div>
         </div>
-        <div className="profile-info-row">
-          <label><b>First Name:</b></label>
-          <p>{userData.firstName}</p>
-        </div>
-        <div className="profile-info-row">
-          <label><b>Last Name:</b></label>
-          <p>{userData.lastName}</p>
-        </div>
-        <div className="profile-info-row">
-          <label><b>Email:</b></label>
-          <p>{userData.email}</p>
-        </div>
-        <div className="profile-info-row">
-          <label><b>Number of followers:</b></label>
-          <p>{userData.numberOfFollowing}</p>
-        </div>
-      </div>
 
-      <div className="profile-section">
-        <h2>Location</h2>
-        <div>
-          <MapContainer
-            center={[userData.location?.lat || 51.505, userData.location?.lng || -0.09]}
-            zoom={13}
-            style={{ height: '300px', width: '100%' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={[userData.location?.lat || 51.505, userData.location?.lng || -0.09]} />
-          </MapContainer>
+        <div className="profile-section">
+          <h2>Location</h2>
+          <div>
+            <MapContainer
+              center={[userData.location ?.lat || 51.505, userData.location ?.lng || -0.09]}
+              zoom={13}
+              style={{ height: '300px', width: '100%' }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={[userData.location ?.lat || 51.505, userData.location ?.lng || -0.09]} />
+            </MapContainer>
+          </div>
         </div>
-      </div>
+      </>
+    )}
+
+    {/* Posts Section */}
+    {activeSection === "posts" && (
+        <div className="profile-section">
+          <h2 className="section-title">User Posts</h2>
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.id} className="post-card">
+                <div className="post-header">
+                  <h3 className="post-title">{post.description}</h3>
+                  <p className="post-date">
+                    <strong>Created On:</strong> {new Date(post.creationDateTime).toLocaleString()}
+                  </p>
+                </div>
+                {post.image && (
+                  <div className="post-image">
+                    <img
+                      src={`data:image/jpeg;base64,${post.image.imageBase64}`}
+                      alt={post.image.relativePath}
+                    />
+                  </div>
+                )}
+                <div className="post-details">
+                  <p>
+                    <strong>Location:</strong> {post.location.city}, {post.location.street},{" "}
+                    {post.location.country}
+                  </p>
+                  <p>
+                    <strong>Likes:</strong> {post.likes}
+                  </p>
+                  <p>
+                    <strong>Comments:</strong> {post.comments.length}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-posts">No posts available...</p>
+          )}
+        </div>
+      )}
+      
+
+      {/* Followers Section */}
+      {activeSection === "following" && (
+        <div className="profile-section">
+          <h2>Followers and Following</h2>
+          <p>Followers and Following will be displayed here...</p>
+        </div>
+      )}
+
     </div>
   );
 };
