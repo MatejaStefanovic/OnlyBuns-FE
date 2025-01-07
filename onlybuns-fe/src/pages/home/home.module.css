@@ -1,0 +1,261 @@
+/* Container and Layout
+.container {
+    display: flex;
+    height: 100vh;
+    background-color: #0C2D48;
+    color: #B1D4E0;
+  }
+  
+  .sidebar {
+    width: 200px;
+    background-color:#145DA0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    border-right: 1px solid #B1D4E0;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 20px;
+
+    /*background-color:#0C2D48;
+  }
+  
+  /* Sidebar 
+  .logo {
+    color:#B1D4E0;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+  
+  .menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+  
+  .menu-item {
+    font-size: 18px;
+    margin: 15px 0;
+    color: #74BDCB;
+    cursor: pointer;
+  }
+  
+  .menu-item:hover {
+    color: #fff;
+  }
+  
+  /* Header 
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color:#145DA0;
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+  
+  .username {
+    font-size: 24px;
+
+  }
+  
+  .nav-menu {
+    display: flex;
+    gap: 20px;
+    margin-left: auto;
+  }
+  
+  .nav-item {
+    text-align: left;
+    font-size: 16px;
+    color:#B1D4E0;
+    cursor: pointer;
+  }
+  
+  .nav-item:hover {
+    color: #fff;
+  }
+  
+  /* Content Section 
+  .content {
+    margin-top: 20px;
+    background-color: #444;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .image-placeholder {
+    width: 100%;
+    height: 400px;
+    background-color: #333;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .profile-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  
+  .caption {
+    font-size: 18px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  */
+ 
+ /*.content-area{
+  background: #2c2c2c;
+ }*/
+ .divzaView {
+  background: #2c2c2c;
+  height: 91.2vh;
+  width: 86vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: auto; 
+  padding: 10px;
+}
+
+.objava {
+  border-radius: 9%;
+  background-color: rgb(223, 235, 245);
+  height: 89%;
+  width: 55%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px; 
+}
+
+.photo{
+  width:100%;
+  height: 100%;
+}
+
+.slika{
+  border:2px solid black;
+  height:60%;
+  margin-top:5%;
+  width:90%;
+}
+.button2{
+  border-radius: 0;
+  height:25%;
+}
+.button{
+  height:6%;
+  border-radius: 50%;
+  border: 0;
+  width:7%;
+  margin-left:86%;
+  margin-top:2%;
+  margin-bottom: -5%;
+}
+.tr{
+  height:100%;
+  width:100%;
+}
+.commentsSection {
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+  z-index: 2;
+}
+.p11{
+  font-size: smaller;
+  color: blue;
+
+}
+.comment {
+  padding: 5px 0;
+  font-size: 14px;
+  color: #333;
+  z-index: 2;
+}
+
+.commentForm {
+  display: flex;
+  align-items: center;
+  padding-top: 5px;
+}
+
+.commentInput {
+  flex: 1;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  outline: none;
+}
+
+.commentButton {
+  background: none;
+  border: none;
+  color: #3897f0;
+  font-weight: bold;
+  margin-left: 5px;
+  cursor: pointer;
+}
+.lajkovi{
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  width:90%;
+  height:17%;
+}
+
+.lajk{
+  height:90%;
+  
+}
+
+.heartR {
+  height: 80%;
+  width: 70%;
+  background-color: white;
+  mix-blend-mode: multiply;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.icon {
+  height: 80%; 
+  width: auto;
+}
+.opis{
+  height:20%;
+}
+.coment{
+  height: 70%;
+  width: 70%;
+}
+
+.buttonFollow{
+  border-radius: 10%;
+  background-color: #ddd;
+  color:#333;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  margin-left:80%;
+  margin-top:2%;
+  margin-bottom: -4%;
+}
+.buttonFollow:hover{
+  background-color: #7d7b88;
+  border-radius: 8%;
+}

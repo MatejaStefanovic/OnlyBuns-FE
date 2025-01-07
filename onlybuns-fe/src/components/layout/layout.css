@@ -8,7 +8,12 @@
     width:80vw;
 }
 
+.sidebar{
+    overflow-y:hidden;
+}
+
 .layout-container{
     overflow-x: hidden;
     overflow-y: hidden;
+   
 }
