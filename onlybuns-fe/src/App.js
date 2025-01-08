@@ -27,6 +27,7 @@ function App() {
           <Route path="admin" element={<AdminList />} />
           <Route path="post" element={<CreatePost />} />
           <Route path="login" element={<Login />} />
+          <Route path="home" element={<HomePage />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="explore" element={<PostsView />} />
           <Route path="edit" element={<EditPost />} />
