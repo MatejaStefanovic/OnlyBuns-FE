@@ -15,6 +15,7 @@ import TestComponent from './pages/test';
 import PostsView from './pages/postsView/posts-view'
 import EditPost from './pages/editPosts/editPosts';
 import LoggedInUserProfile from './pages/user/loggedInUserProfile';
+import TrendsPage from './pages/trends/trends';
 function App() {
 
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="signup" element={<SignUp />} />
           <Route path="explore" element={<PostsView />} />
           <Route path="edit" element={<EditPost />} />
+          <Route path="trends" element={<TrendsPage />} />
         </Route>
         <Route path="myProfile" element={<LoggedInUserProfile />} />
         <Route path="/profile/:username" element={<ProfilePage />} />
