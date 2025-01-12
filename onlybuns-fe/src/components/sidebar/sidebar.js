@@ -9,7 +9,7 @@ const SideBar = () => {
     <div className="sidebar">
       <h1 className="logo">ONLYBUNS</h1>
       <div className="menu">
-        <div><Link className="menu-item" to="/">HOME</Link></div>
+        <div><Link className="menu-item" to="/home">HOME</Link></div>
          <div className="menu-item" ><Link className="menu-item" to="/explore">EXPLORE</Link></div>
         <div className="menu-item">NOTIFICATIONS</div>
         <div className="menu-item">SETTINGS</div>
