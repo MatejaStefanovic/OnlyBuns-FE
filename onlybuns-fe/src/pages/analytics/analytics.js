@@ -23,6 +23,15 @@ const AnalyticsPage = () => {
   */
 
   const [data, setData] = useState(null);
+  
+  const [postsWeekly, setPW] = useState(1);
+  const [postsMonthly, setPM] = useState(1);
+  const [postsYearly, setPY] = useState(1);
+
+  const [commentsWeekly, setCW] = useState(1);
+  const [commentsMonthly, setCM] = useState(1);
+  const [commentsYearly, setCY] = useState(1);
+
 
   useEffect(() => {
     fetch("http://localhost:8080/api/users/analytics")
@@ -36,16 +45,99 @@ const AnalyticsPage = () => {
       .catch((error) => console.error("Error fetching user activity:", error));
   }, []);
 
-  if (!data) {
-    return <div>Loading...</div>;
-  }
 
-  const radarData = [
-    { metric: "Users with Posts", percentage: data.usersWithPosts },
-    { metric: "Users with Only Comments", percentage: data.usersWithOnlyComments },
-    { metric: "Inactive Users", percentage: data.inactiveUsers },
-  ];
-  
+  useEffect(() => {
+    fetch("http://localhost:8080/api/post/weekly")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((weeklyPosts) => setPW(weeklyPosts))
+      .catch((error) =>
+        console.error("Error fetching weekly post statistics:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/comment/weekly")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((weeklyComments) => setCW(weeklyComments))
+      .catch((error) =>
+        console.error("Error fetching weekly post statistics:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/post/monthly")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((monthlyPosts) => setPM(monthlyPosts))
+      .catch((error) =>
+        console.error("Error fetching weekly post statistics:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/comment/monthly")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((monthlyComments) => setCM(monthlyComments))
+      .catch((error) =>
+        console.error("Error fetching weekly post statistics:", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/post/yearly")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((yearlyPosts) => setPY(yearlyPosts))
+      .catch((error) =>
+        console.error("Error fetching yearly post statistics:", error)
+      );
+  }, []);
+  useEffect(() => {
+    fetch("http://localhost:8080/api/comment/yearly")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((yearlyComments) => setCY(yearlyComments))
+      .catch((error) =>
+        console.error("Error fetching yearly post statistics:", error)
+      );
+  }, []);
+
+
+  const radarData = data
+  ? [
+      { metric: "Users with Posts", percentage: data.usersWithPosts || 0 },
+      { metric: "Users with Only Comments", percentage: data.usersWithOnlyComments || 0 },
+      { metric: "Inactive Users", percentage: data.inactiveUsers || 0 },
+    ]
+  : [];
+
 
   return (
     <div className={styles.analyticsPg}>
@@ -80,7 +172,7 @@ const AnalyticsPage = () => {
           <h2>Posts</h2>
           <div className={styles.inner}>
             <img className={styles.innerimg} src={post} alt="Post" />
-            <p className={styles.pi}>12</p>
+            <p className={styles.pi}>{postsWeekly}</p>
           </div>
           <h3 className={styles.wh3}>weekly</h3>
         </div>
@@ -88,7 +180,7 @@ const AnalyticsPage = () => {
           <h2>Posts</h2>
           <div className={styles.inner}>
             <img className={styles.innerimg} src={post} alt="Post" />
-            <p className={styles.pi}>56</p>
+            <p className={styles.pi}>{postsMonthly}</p>
           </div>
           <h3 className={styles.wh3}>monthly</h3>
         </div>
@@ -96,7 +188,7 @@ const AnalyticsPage = () => {
           <h2>Posts</h2>
           <div className={styles.inner}>
             <img className={styles.innerimg} src={post} alt="Post" />
-            <p className={styles.pi}>610</p>
+            <p className={styles.pi}>{postsYearly}</p>
           </div>
           <h3 className={styles.wh3}>yearly</h3>
         </div>
@@ -106,7 +198,7 @@ const AnalyticsPage = () => {
           <h2>Comments</h2>
           <div className={styles.inner}>
             <img className={styles.innerimg2} src={com} alt="Com" />
-            <p className={styles.pi2}>59</p>
+            <p className={styles.pi2}>{commentsWeekly}</p>
           </div>
           <h3 className={styles.wh32}>weekly</h3>
         </div>
@@ -114,7 +206,7 @@ const AnalyticsPage = () => {
           <h2>Comments</h2>
           <div className={styles.inner}>
             <img className={styles.innerimg2} src={com} alt="Com" />
-            <p className={styles.pi2}>590</p>
+            <p className={styles.pi2}>{commentsMonthly}</p>
           </div>
           <h3 className={styles.wh32}>monthly</h3>
         </div>
@@ -122,7 +214,7 @@ const AnalyticsPage = () => {
           <h2>Comments</h2>
           <div className={styles.inner}>
             <img className={styles.innerimg2} src={com} alt="Com" />
-            <p className={styles.pi2}>5900</p>
+            <p className={styles.pi2}>{commentsYearly}</p>
           </div>
           <h3 className={styles.wh32}>yearly</h3>
         </div>
