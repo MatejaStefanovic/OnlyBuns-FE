@@ -1,0 +1,143 @@
+/* Container for the buttons and heading */
+.header-container {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  justify-content: space-between; /* Space between text and buttons */
+  margin-bottom: 20px; /* Spacing below the header */
+  color: white; /* White text color */
+}
+
+.overalltrends{
+width:100%;
+overflow-y: auto;
+ height:94vh;
+}
+/* Buttons container */
+.button-group {
+  display: flex;
+  gap: 10px; /* Space between buttons */
+}
+
+/* Button styles */
+button {
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  border: none; /* Remove border */
+  padding: 8px 16px; /* Button padding */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 14px; /* Button font size */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Active button styling */
+button.active {
+  font-weight: bold;
+  background-color: #0056b3; /* Darker blue for active button */
+}
+
+/* Button hover effect */
+button:hover {
+  background-color: #0056b3; /* Slightly darker background on hover */
+}
+
+/* Container for all individual cards */
+.card-container {
+  flex-wrap: wrap;
+  gap: 30px; /* Space between cards */
+  justify-content: center;
+  padding: 30px; /* Padding around the card container */
+  background-color: #2c2c2c; /* Soft background color */
+}
+
+/* Individual card styling */
+.individual-card {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient for depth */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Soft shadow */
+  width: 320px; /* Fixed card width */
+  padding: 20px; /* Inner padding */
+  overflow: hidden; /* Prevent overflow issues */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+/* Card hover effect */
+.individual-card:hover {
+  transform: translateY(-8px); /* Elevated effect on hover */
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1); /* Stronger shadow on hover */
+}
+
+/* Card header styling */
+.card-header {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 20px; /* Title font size */
+  font-weight: 600; /* Bold title */
+  color: #333; /* Dark text color */
+  margin: 0; /* Reset margin */
+  transition: color 0.3s ease; /* Smooth hover effect for color */
+}
+
+/* Title hover effect */
+.card-title:hover {
+  color: #007bff; /* Hover color change */
+}
+
+.card-date {
+  font-size: 14px; /* Date font size */
+  color: #777; /* Muted text color */
+  margin-top: 5px; /* Space above date */
+}
+
+/* Card image styling */
+.card-image {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.card-image img {
+  width: 100%; /* Full width */
+  height: auto; /* Maintain aspect ratio */
+  max-height: 220px; /* Max image height */
+  object-fit: cover; /* Cover entire area */
+  border-radius: 8px; /* Rounded corners */
+  border: 2px solid #ddd; /* Light border */
+  transition: transform 0.3s ease; /* Smooth hover effect */
+}
+
+/* Image hover effect */
+.card-image img:hover {
+  transform: scale(1.05); /* Subtle zoom effect on hover */
+}
+
+/* Details section styling */
+.card-details {
+  font-size: 14px; /* Text size */
+  color: #555; /* Muted text color */
+  margin-top: 15px; /* Space above details */
+}
+
+.card-details p {
+  margin: 10px 0; /* Vertical spacing */
+  line-height: 1.6; /* Improve readability */
+}
+
+.card-details strong {
+  color: #333; /* Emphasized text color */
+  font-weight: 500; /* Semi-bold font */
+}
+
+/* Responsive design: Adjust card size on smaller screens */
+@media (max-width: 768px) {
+  .card-container {
+    padding: 20px; /* Reduce padding */
+  }
+  
+  .individual-card {
+    width: 100%; /* Full width on smaller screens */
+    max-width: 500px; /* Ensure cards are not too wide */
+  }
+}

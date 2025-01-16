@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '../../context/userContext'; // Assuming userContext is where you get user data
+import { useUser } from '../../context/userContext'; 
 import { useNavigate } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
