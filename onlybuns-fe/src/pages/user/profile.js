@@ -27,6 +27,7 @@ const ProfilePage = () => {
   const [activeSection, setActiveSection] = useState('profile');
   const [posts, setPosts] = useState([]);
   const [isFollowed, setIsFollowed] = useState(false);
+  
 
   useEffect(() => {
     // Fetch user data dynamically if not in context
@@ -37,8 +38,7 @@ const ProfilePage = () => {
         if (!response.ok) throw new Error('User not found');
         const data = await response.json();
 
-        setUserr(data);
-
+      
         if (data.email === contextUser.email) {
           navigate('/myProfile');
         } else {
@@ -135,7 +135,9 @@ async function unfollowUser(){
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-
+  if (contextUser.username === username){
+    navigate("/myprofile");
+  }
   const userData = user || contextUser; // Use fetched user or context user
 
   return (
@@ -147,7 +149,7 @@ async function unfollowUser(){
         <button className="home-button" style={{ marginRight: 22.2 + "rem" }} onClick={() => setActiveSection("profile")}>Profile information</button>
         <button className="home-button" style={{ marginRight: 9.8 + "rem" }} onClick={() => setActiveSection("following")}>Followers and Following</button>
         <button className="home-button" onClick={() => setActiveSection("posts")}>Posts</button>
-        <button className="home-button" onClick={() => navigate('/')}>Home</button>
+        <button className="home-button" onClick={() => navigate('/home')}>Home</button>
       </div>
 
       {activeSection === "profile" && (
