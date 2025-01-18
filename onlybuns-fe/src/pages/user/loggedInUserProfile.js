@@ -59,7 +59,7 @@ const CurrentUserProfile = () => {
   };
 
   const handleHomeClick = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const handleSaveChanges = () => {
@@ -299,7 +299,7 @@ const CurrentUserProfile = () => {
                     <strong>Likes:</strong> {post.likes}
                   </p>
                   <p>
-                    <strong>Comments:</strong> {post.comments.length}
+                    <strong>Comments:</strong> {post.comments}
                   </p>
                 </div>
               </div>
