@@ -38,7 +38,7 @@ const TrendsPage = () => {
   }, [activeSection]);
 
   return (
-    <div>
+    <div className="overalltrends">
       <div className="header-container">
         <div className="button-group">
           <button

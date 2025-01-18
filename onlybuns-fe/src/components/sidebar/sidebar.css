@@ -4,8 +4,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height:100vh;
     border-right: 1px solid #B1D4E0;
+
   }
   .logo {
     color:#B1D4E0;
