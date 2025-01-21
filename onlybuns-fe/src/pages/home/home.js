@@ -103,9 +103,9 @@ function HomePage() {
                     .map(post => {
                         const isLiked = post.likesList?.some(like => like.user.username === username);
                         console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
-                        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+                        const isFollowed = post.user.followers?.some(follower => follower === username) ?? false;
                         post.user.followers.forEach(follower => {
-                            console.log(`Follower username: ${follower.username}`);
+                            console.log(`Follower username: ${follower}`);
                         });
                         return {
                             ...post,
