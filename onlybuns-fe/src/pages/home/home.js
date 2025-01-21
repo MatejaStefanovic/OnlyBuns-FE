@@ -254,7 +254,7 @@ function HomePage() {
                 return (
                     <div key={post.id} className={styles.objava}>
                         {post.user ?.username === username && (
-                            <button className={styles.button} onClick={() => deletePost(post.id)}>
+                            <button className={styles.but1ton} onClick={() => deletePost(post.id)}>
                                 <img className={styles.tr} src={trash} alt="Trash Icon" />
                             </button>
                         )}
@@ -281,23 +281,44 @@ function HomePage() {
                                     />
                                 )}
                         </div>
+                        {user && (
                         <p 
                             className={styles.p11} 
                             onClick={() => navigate(`/profile/${post.user?.username}`)}
                             style={{ cursor: 'pointer' }} 
                         >
                             @{post.user?.username}
-                        </p>
+                            </p>
+                        )}
+                         {!user && (
+                        <p 
+                            className={styles.p11} 
+                        
+                        >
+                            @{post.user?.username}
+                            </p>
+                        )}
+                            
                         <div className={styles.lajkovi}>
 
                             <p>{post.likes}</p>
                             <div className={styles.lajk}>
-                                {user ? (
+                                {user && (
                                     <img
                                     id={`myImage-${post.id}`}
                                     className={styles.heartR}
                                     src={post.isLiked ? red : empty} // Menja se na osnovu `post.isLiked`
                                     onClick={() => toggleLike(post.id)}
+                                    alt="Heart Icon"
+                                  />
+                                  
+                                ) }
+
+                                    {!user ? (
+                                    <img
+                                    id={`myImage-${post.id}`}
+                                    className={styles.heartR}
+                                    src={post.isLiked ? red : empty} 
                                     alt="Heart Icon"
                                   />
                                   
@@ -307,13 +328,12 @@ function HomePage() {
 
                             </div>
                             <div className={styles.com} onClick={() => toggleComments(post.id)}>
-                                {user ? (
+                               
                                     <img src={comm} className={styles.coment} alt="Comment Icon" />
-                                ) : (
-                                        <p></p>
-                                    )}
+                                 
 
                             </div>
+                            
                             {post.user?.username === username && (
                                 <button className={styles.button2} onClick={() => editPost(post)}>
                                     edit
@@ -322,14 +342,14 @@ function HomePage() {
                         </div>
                         <div className={styles.opis}>{post.description}</div>
 
-                        {post.showComments && (
+                        {post.showComments &&  (
                             <div className={styles.commentsSection}>
                                 {post.comments.map((comment, index) => (
                                     <div key={index} className={styles.comment}>
                                         <strong>{comment.user ?.username}</strong>: {comment.description}
                                     </div>
                                 ))}
-                                <form
+                                { user  && ( <form
                                     onSubmit={(e) => {
                                         e.preventDefault();
                                         const commentText = e.target.comment.value;
@@ -346,6 +366,7 @@ function HomePage() {
                                     />
                                     <button type="submit" className={styles.commentButton} >Post</button>
                                 </form>
+                                )}
                             </div>
                         )}
                     </div>

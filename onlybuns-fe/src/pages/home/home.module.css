@@ -156,7 +156,7 @@
   border-radius: 0;
   height:25%;
 }
-.button{
+.but1ton{
   height:6%;
   border-radius: 50%;
   border: 0;
@@ -173,7 +173,11 @@
   padding-top: 10px;
   border-top: 1px solid #ddd;
   z-index: 2;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255,0.4);
+  
 }
+
 .p11{
   font-size: smaller;
   color: blue;
@@ -258,4 +262,7 @@
 .buttonFollow:hover{
   background-color: #7d7b88;
   border-radius: 8%;
+}
+.com:active{
+  transform: scale(1.1);
 }
