@@ -4,6 +4,7 @@ import red from '../../assets/images/redheart.png';
 import empty from '../../assets/images/emptyheart.png';
 import comm from '../../assets/images/com.png';
 import trash from '../../assets/images/trash.png';
+import adv from '../../assets/icons/megaphone.png';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/userContext';
 
@@ -12,7 +13,7 @@ function PostsView() {
     const { user, token } = useUser();
     const navigate = useNavigate();
     const username = user ?.username;
-    
+    const userRole = user ?.role;
    
     // async function addComment(postId, commentText) {
     //     if (!commentText.trim()) return;
@@ -65,20 +66,75 @@ function PostsView() {
             const updatedPost = await response.json();
     
             // Ažuriramo stanje sa vraćenim postom
-            setPosts(posts.map(post =>
-                            post.id === postId
-            
-                                 ? {
-                                     ...post,
-                                    comments: [...post.comments, { description: commentText, user: { username } }],
-                                 }
-                                 : post
-        ));
+            setPosts(
+                posts.map((post) =>
+                  post.id === postId
+                    ? {
+                        ...post,
+                        comments: [
+                          ...post.comments,
+                          { description: commentText, user: { username }, creationDateTime: new Date().toISOString() },
+                        ].sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime)), // Sortiranje po datumu
+                      }
+                    : post
+                )
+              );
+              
         } catch (error) {
             console.error("Error adding comment:", error);
         }
+
+      
     }
     
+    // async function addComment(postId, commentText) {
+    //     if (!commentText.trim()) return;
+      
+    //     try {
+    //       const response = await fetch(
+    //         `http://localhost:8080/api/posts/${postId}/comment?username=${username}&description=${commentText}`,
+    //         {
+    //           method: 'POST',
+    //           headers: {
+    //             'Authorization': `Bearer ${token}`,
+    //             'Content-Type': 'application/json',
+    //           },
+    //         }
+    //       );
+      
+    //       if (response.status === 403) {
+    //         alert('You have exceeded the comment limit for the last hour.');
+    //         return;
+    //       }
+      
+    //       if (response.status === 404) {
+    //         alert('Post or user not found.');
+    //         return;
+    //       }
+      
+    //       if (!response.ok) throw new Error('Failed to add comment');
+      
+    //       const updatedPost = await response.json(); // Backend vraća ceo ažurirani post
+      
+    //       // Ažuriramo stanje sa vraćenim postom
+    //       setPosts(
+    //         posts.map((post) =>
+    //           post.id === postId
+    //             ? {
+    //                 ...updatedPost,
+    //                 comments: updatedPost.comments.sort(
+    //                   (a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime) // Sortira najnovije na početak
+    //                 ),
+    //               }
+    //             : post
+    //         )
+    //       );
+    //     } catch (error) {
+    //       console.error('Error adding comment:', error);
+    //     }
+    //   }
+      
+      
 
     useEffect(() => {
         async function fetchPosts() {
@@ -287,14 +343,41 @@ function PostsView() {
         }
       }
       
+      const markForAds = async (post) => {
+        const formData = new FormData();
+       
+      
+        const response = await fetch(`http://localhost:8080/api/advertisiment/posts/markForAds/${post.id}`, {
+          method: "PUT",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      
+        if (!response.ok) {
+          alert("Failed to mark post for ads.");
+        } else {
+          alert("Post successfully marked for ads.");
+        }
+      };
       
     
 
     function toggleComments(postId) {
-        setPosts(posts.map(post =>
-
-            post.id === postId ? { ...post, showComments: !post.showComments } : post
-        ));
+        setPosts(
+            posts.map((post) =>
+              post.id === postId
+                ? {
+                    ...post,
+                    showComments: !post.showComments,
+                    comments: [...post.comments].sort(
+                      (a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime) // Sortira najnovije na početak
+                    ),
+                  }
+                : post
+            )
+          );
     }
 
     return (
@@ -315,6 +398,17 @@ function PostsView() {
                              {post.isFollowed ? "Unfollow" : "Follow"}
                          </button>
                         )}
+                        {!post.suitableForAds && userRole === "ADMIN" && (
+                            <img
+                                
+                            src={adv} 
+                            alt="Mark for Ads"
+                            onClick={() => markForAds(post)}
+                            style={{ cursor: 'pointer', width: '30px', height: '30px' }}
+                                
+                           />
+                            
+                            )}
                         <div className={styles.slika}>
                             {post.image ?.imageBase64 ? (
                                 <img
