@@ -1,0 +1,84 @@
+.buttonss{
+    display: flex;
+    flex-direction: row;
+    width:100%;
+}
+
+.b{
+    width:100%;
+    background-color:rgb(98, 104, 102);
+}
+.bu{
+    width:10%;
+    background-color:rgb(98, 104, 102);
+}
+.b:hover{
+    background-color: rgb(40, 124, 163);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+.b:active{
+    background-color: rgb(40, 124, 163);
+}
+.unread{
+    border: 5px solid rgb(45, 109, 205);
+}
+.prof{
+    height:100%;
+    margin-right:10%;
+    width:10%;
+    border-radius: 40%;
+    
+}
+.mmessage{
+    background-color:white;
+    position: relative;
+    margin:2%;
+    color:black;
+    border-radius: 4%;
+    width:60%;
+    padding:0.5%;
+    height:5%;
+    margin-left:10%;
+}
+
+.unread{
+    border: 5px solid rgb(45, 109, 205);
+    background-color:white;
+    margin:2%;
+    color:black;
+    border-radius: 4%;
+    width:59%;
+    margin-left:10%;
+}
+.mmessage:hover{
+    transform: scale(1.05);
+}
+.inb{
+    width:100%;
+    max-height:94.2vh;
+    overflow-y: auto;
+}
+.whole{
+    width:100%;
+    display: flex;
+    flex-direction: row;
+   
+}
+.second{
+    background-color: whitesmoke;
+    width:100%;
+    color:black;
+}
+
+.neww{
+    height:100%;
+    right:10px;
+    position:absolute;
+    filter: contrast(1.5) saturate(1.5);
+    width:10%;
+}
+.active-tab {
+    background-color: rgb(20, 90, 150);
+    color: white;
+    font-weight: bold;
+}
