@@ -68,7 +68,51 @@
     background-color: whitesmoke;
     width:100%;
     color:black;
+    display: flex;
+    flex-direction: column;
 }
+.second1 {
+    background-color: whitesmoke;
+    width: 100%;
+   
+    color: black;
+    border: 1px solid gray;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+  
+  .second1 label {
+    margin-right: 10px;
+  }
+  
+  .friendSelect {
+    flex-grow: 1;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid gray;
+  }
+  
+  .second2 {
+    background-color: whitesmoke;
+    width: 100%;
+    height:90%;
+    color: black;
+    border: 1px solid gray;
+    padding: 5px;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .messageInput {
+    width: 100%;
+    height:90%;
+    
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid gray;
+    border-radius: 5px;
+  }
 
 .neww{
     height:100%;

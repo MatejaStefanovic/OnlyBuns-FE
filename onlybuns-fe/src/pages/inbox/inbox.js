@@ -1,8 +1,102 @@
 import React from 'react';
 import styles from './inbox.module.css';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useUser } from '../../context/userContext';
 import im  from '../../assets/images/nature.jpg'; 
 import neww  from '../../assets/icons/circle.png'; 
+
+
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 function InboxPage() {
+
+
+   const { user, token } = useUser();
+      const username = user ?.username;
+  const [selectedFriend, setSelectedFriend] = useState('');
+  const [stompClient, setStompClient] = useState(null);
+  const [selectedMssg, setSelectedMssg] = useState('');
+ /* const friends = [
+    "Alice", "Bob", "Charlie", "David", "Emma", "Frank",
+    "George", "Helen", "Isabella", "Jack", "Kate", "Liam",
+    "Mike", "Nancy", "Oliver", "Peter"
+  ];*/
+
+  const[friends, setFr] = useState([]);
+useEffect(() => {
+    fetch(`http://localhost:8080/api/users/following?username=${user.username}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((friends) => setFr(friends))
+      .catch((error) =>
+        console.error("Error fetching following info:", error)
+      );
+  }, []);
+///konekcija sa web socketom
+useEffect(() => {
+  const socket = new SockJS("http://localhost:8080/socket");
+  const client = new Client({
+    webSocketFactory: () => socket,
+    debug: (msg) => console.log(msg),
+    reconnectDelay: 5000, //rekonekt na svakih 5 sec
+  });
+
+  client.onConnect = () => {
+    console.log("Connected to WebSocket server.");
+    setStompClient(client);
+
+    client.subscribe("/socket-publisher/private-chat", (message) => {
+      console.log("📩 Received message:", JSON.parse(message.body));
+    });
+  };
+
+  
+  client.activate();
+
+  return () => {
+    if (client.connected) {
+      client.deactivate();
+    }
+  };
+}, []);
+
+
+
+  const sendMessage = () => {
+    if (!stompClient || !stompClient.connected) {
+      console.error("WebSocket is not connected.");
+      return;
+    }
+
+    if (!selectedFriend || !selectedMssg) {
+      alert("Please select a friend and write a message.");
+      return;
+    }
+
+    const message = {
+      senderUsername: user.username,
+      receiverUsername: selectedFriend,
+      content: selectedMssg,
+      time: new Date().toISOString().slice(0, 19),
+
+    };
+
+    console.log("Sending message:", message);
+
+    try {
+      stompClient.publish({
+        destination: "/socket-subscriber/private-chat", 
+        body: JSON.stringify(message),
+      });
+    } catch (error) {
+      console.error("❌ Error sending message:", error);
+    }
+  };
   const chats = [
     { id: 1, receiverUsername: "Alice", senderUsername: "Bob", dateTime: "2024-01-30T10:15:00", isRead: true, content: "Hey Alice, how are you?" },
     { id: 2, receiverUsername: "Alice", senderUsername: "Charlie", dateTime: "2024-01-30T10:16:00", isRead: true, content: "Alice, let's meet up later." },
@@ -43,7 +137,25 @@ return (
     ))}
   </div>
   <div className={styles.second}>
-    New chat 
+  <div className={styles.second1}>
+          <label htmlFor="friend-select">To:</label>
+          <select
+            id="friend-select"
+            value={selectedFriend}
+            onChange={(e) => setSelectedFriend(e.target.value)}
+            className={styles.friendSelect}
+          >
+            <option value="">Select a friend</option>
+            {friends.map((friend, index) => (
+              <option key={index} value={friend}>{friend}</option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.second2}>
+          <textarea type="text" placeholder="Write your message..." className={styles.messageInput} onChange={(e) => setSelectedMssg(e.target.value)}/>
+        </div>
+        <div><button onClick={sendMessage}>Send</button>
+        </div>
   </div>
   </div>
 );
