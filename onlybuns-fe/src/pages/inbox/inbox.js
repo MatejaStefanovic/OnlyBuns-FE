@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useUser } from '../../context/userContext';
 import im  from '../../assets/images/nature.jpg'; 
+import send from '../../assets/icons/send-message.png'
 import neww  from '../../assets/icons/circle.png'; 
 import { useRef } from 'react';
 
@@ -15,10 +16,11 @@ function InboxPage() {
   const subscriptionRef = useRef(null);
   const [chatMessages, setChatMessages] = useState({}); 
   const [messageStatus, setMessageStatus] = useState('');
+  const [flagGroupChat, setFlagGroupChat] = useState(false);
   const [chatDetails, setChatDetails] = useState({});
   const { user, token } = useUser();
   const username = user ?.username;
-
+  const [groupMembers, setGroupMembers] = useState([]); 
   const [selectedFriend, setSelectedFriend] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [chatSelected, setChatSelected] = useState('');
@@ -35,6 +37,7 @@ function InboxPage() {
   ];*/
 
   const[friends, setFr] = useState([]);
+  
   const[chats, setC] = useState([]);
 
 useEffect(() => {
@@ -65,7 +68,49 @@ useEffect(() => {
         console.error("Error fetching chats info:", error)
       );
   }, []);
+function setGroupChatOpen(){
+  setFlagGroupChat(!flagGroupChat);
+}
 
+  function markRead(){
+    fetch(`http://localhost:8080/api/mess/read?sender=${chatSelected}&receiver=${username}`, {method:"POST"})
+    .then((response)=>{
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setChatDetails((prevDetails) => ({
+        ...prevDetails,
+        [chatSelected]: { ...prevDetails[chatSelected], read: true },
+      }));
+      return response.json();
+      
+    }).catch((error) => console.error("Error marking messages as read:", error));
+  }
+
+  function poopulateChat(){
+    fetch(`http://localhost:8080/api/mess/previousMessages?sender=${chatSelected}&receiver=${username}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((messages) => {
+        const filteredkeys = messages.map((msg)=> {
+          const chatKey= msg.senderUsername === username ? msg.receiverUsername : msg.senderUsername;
+          return {...msg,chatKey};
+        });
+
+        setChatMessages((prev) => ({
+          ...prev,
+          [chatSelected]: filteredkeys,
+        }));
+    
+      })
+      .catch((error) => console.error("Error fetching previous messages:", error));
+    
+     
+  };
 
   useEffect(() => {
     const fetchAllChatDetails = async () => {
@@ -84,6 +129,8 @@ useEffect(() => {
         });
   
         setChatDetails(detailsMap);
+        console.log("chatDetails:", chatDetails);
+   
       } catch (error) {
         console.error("Error fetching chat details:", error);
       }
@@ -140,7 +187,14 @@ useEffect(() => {
           [chatKey]: [...(prev[chatKey] || []), receivedMessage],
         };
       });
-
+      console.log("selected", chatSelected);
+      console.log("key:", chatKey);
+      
+      setChatDetails((prevDetails) => ({
+        ...prevDetails,
+        [chatKey]: { ...prevDetails[chatKey], read: false },
+      }));
+    
       setC((prevChats) => {
         if (!prevChats.includes(chatKey)) {
           return [...prevChats, chatKey]; 
@@ -173,10 +227,14 @@ useEffect(() => {
 function OpenChat(chat){
   setChatOpen(true);
   setChatSelected(chat);
+  poopulateChat();
+  setSelectedFriend(chat);
+  markRead();
   console.log("Opening chat with:", chat); // Debugging
   console.log("chatMessages:", chatMessages);
 console.log("chatSelected:", chatSelected);
 console.log("chatMessages[chatSelected]:", chatMessages[chatSelected]);
+console.log("chatDetails[chat]:", chatDetails[chatSelected]);
 
  
 }
@@ -220,30 +278,12 @@ console.log("chatMessages[chatSelected]:", chatMessages[chatSelected]);
       });
      
   
-     
-      alert('Message sent succesfully');
+
     } catch (error) {
       console.error("❌ Error sending message:", error);
       setMessageStatus("Error sending message...");
     }
   };
-  /*const chats = [
-    { id: 1, receiverUsername: "Alice", senderUsername: "Bob", dateTime: "2024-01-30T10:15:00", isRead: true, content: "Hey Alice, how are you?" },
-    { id: 2, receiverUsername: "Alice", senderUsername: "Charlie", dateTime: "2024-01-30T10:16:00", isRead: true, content: "Alice, let's meet up later." },
-    { id: 3, receiverUsername: "Alice", senderUsername: "David", dateTime: "2024-01-30T10:17:00", isRead: false, content: "Alice, I sent you the report." },
-    { id: 4, receiverUsername: "Alice", senderUsername: "Emma", dateTime: "2024-01-30T10:18:00", isRead: true, content: "Hey Alice, are you coming to the party?" },
-    { id: 5, receiverUsername: "Alice", senderUsername: "Frank", dateTime: "2024-01-30T10:19:00", isRead: false, content: "Alice, do you have the project files?" },
-    { id: 6, receiverUsername: "Alice", senderUsername: "George", dateTime: "2024-01-30T10:20:00", isRead: true, content: "Alice, can you help me with the code?" },
-    { id: 7, receiverUsername: "Alice", senderUsername: "Helen", dateTime: "2024-01-30T10:21:00", isRead: true, content: "Alice, let's go for lunch!" },
-    { id: 8, receiverUsername: "Alice", senderUsername: "Isabella", dateTime: "2024-01-30T10:22:00", isRead: false, content: "Alice, did you finish the project?" },
-    { id: 9, receiverUsername: "Alice", senderUsername: "Jack", dateTime: "2024-01-30T10:23:00", isRead: true, content: "Alice, I sent you the invitation!" },
-    { id: 10, receiverUsername: "Alice", senderUsername: "Kate", dateTime: "2024-01-30T10:24:00", isRead: false, content: "Alice, don't forget our meeting at 3." },
-    { id: 11, receiverUsername: "Alice", senderUsername: "Liam", dateTime: "2024-01-30T10:25:00", isRead: true, content: "Alice, can you review my code?" },
-    { id: 12, receiverUsername: "Alice", senderUsername: "Mike", dateTime: "2024-01-30T10:26:00", isRead: true, content: "Alice, let's schedule a call." },
-    { id: 13, receiverUsername: "Alice", senderUsername: "Nancy", dateTime: "2024-01-30T10:27:00", isRead: false, content: "Alice, what time are you free?" },
-    { id: 14, receiverUsername: "Alice", senderUsername: "Oliver", dateTime: "2024-01-30T10:28:00", isRead: true, content: "Alice, I need your feedback on my design." },
-    { id: 15, receiverUsername: "Alice", senderUsername: "Peter", dateTime: "2024-01-30T10:29:00", isRead: false, content: "Alice, do you want to join our study session?" }
-  ];*/
 
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return "";
@@ -271,20 +311,37 @@ console.log("chatMessages[chatSelected]:", chatMessages[chatSelected]);
 return (
   <div className={styles.whole}>
   <div  className={styles.inb}> 
+   {flagGroupChat &&  ( <div className={styles.createGroup} >
+      <p>Add friends: <select
+  id="friend-select"
+  multiple  
+  value={groupMembers}
+  onChange={(e) => setGroupMembers([...e.target.selectedOptions].map(option => option.value))}
+  className={styles.friendSelect}
+>
+  <option value="" disabled>Select friends</option>
+  {friends.map((friend, index) => (
+    <option key={index} value={friend}>{friend}</option>
+  ))}
+</select></p>
+      <p>Group name: <input type="text" placeholder='Write name'></input></p>
+<button>Make</button>
+    </div>
+)}
     <div className={styles.buttonss}>
       <button  className={styles.b}>Private Chats</button>
       <button  className={styles.b}>Group Chats</button>
 
     </div>
-    <button className={styles.bu}>New Group</button>
+    <button className={styles.bu}  onClick={setGroupChatOpen}>New Group</button>
     <button className={styles.bu} onClick={newMssg}>New Message</button>
     {chats.map((chat) => (
-      <div  key={chat}    className={`${styles.mmessage}  ${chat.isRead ? styles.read : styles.unread}`} onClick={() => OpenChat(chat)}>
+      <div  key={chat}    className={`${styles.mmessage}  ${chatDetails[chat]?.read ? styles.read : styles.unread}`} onClick={() => OpenChat(chat)}>
       
         <img src={im} className={styles.prof}></img>
         {chat}
         <span className={styles.dat}>{formatDateTime(chatDetails[chat]?.dateTime)}</span>
-        { !chatDetails[chat]?.isRead && (
+        { !chatDetails[chat]?.read && (
         < img src={neww} className={styles.neww}></img>
         )}
      {/*  { !chat.isRead && (
@@ -313,6 +370,7 @@ return (
             ))}
 
     </div>
+    <div> <div className={styles.inputmess}> <input type="text" placeholder="Write your message..." onChange={(e) => setSelectedMssg(e.target.value)}></input>  <button onClick={sendMessage} > <img src={send}></img></button></div></div>
   </div>
 )}
 
