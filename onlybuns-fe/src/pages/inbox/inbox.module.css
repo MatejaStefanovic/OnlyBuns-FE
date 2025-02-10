@@ -14,14 +14,27 @@
     background-color:rgb(98, 104, 102);
 }
 .bu{
-    width:10%;
+    margin-top:2%;
+    width:8%;
     background-color:rgb(98, 104, 102);
+}
+.bu img{
+    width:100%;
+   
+    height:100%;
 }
 .b:hover{
     background-color: rgb(40, 124, 163);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 .b:active{
+    background-color: rgb(40, 124, 163);
+}
+.bu:hover{
+    background-color: rgb(40, 124, 163);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+.bu:active{
     background-color: rgb(40, 124, 163);
 }
 .unread{
@@ -168,3 +181,42 @@
 .createGroup input{
     width:90%;
 }
+
+.friendSelect {
+    width: 100%;
+    height: auto;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+  }
+  
+  .friendSelect option {
+    padding: 8px;
+    font-size: 14px;
+    background: #f8f8f8;
+    color: #333;
+  }
+  
+  .friendSelect:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  .friendSelect option:checked {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+ .sentMessage{
+    background-color: #007bff;
+ }
+ .sentMessage span{
+   color:rgb(161, 159, 159);
+   margin-left:80%;
+ }
+ .receivedMessage span{
+    color:gray;
+    margin-left:80%;
+ }
