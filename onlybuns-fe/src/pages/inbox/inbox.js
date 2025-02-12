@@ -18,6 +18,7 @@ function InboxPage() {
 
   const subscriptionRef = useRef(null);
   const [chatMessages, setChatMessages] = useState({}); 
+  const[memberAdding, setMemberAdding] = useState (false);
   const [messageStatus, setMessageStatus] = useState('');
   const [selectedGroupName, setSelectedGroupName] = useState('');
   const [flagGroupChat, setFlagGroupChat] = useState(false);
@@ -30,7 +31,7 @@ function InboxPage() {
   const [groupMembers, setGroupMembers] = useState([]); 
   const [groups, setGroups] = useState([]); 
   const [selectedFriend, setSelectedFriend] = useState('');
-
+  const [friend, setFriend] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -98,11 +99,11 @@ useEffect(() => {
   function makeGroup(){
     const group = {
       admin: user.username,
-      members: groupMembers,
       groupName: selectedGroupName,
 
     };
-    fetch(`http://localhost:8080/api/mess/newGroup`, {body:JSON.stringify(group),method:"PUT",headers: { "Content-Type": "application/json" },})
+    const usersParam = groupMembers.join(","); 
+    fetch(`http://localhost:8080/api/mess/newGroup?users=${encodeURIComponent(usersParam)}`, {body:JSON.stringify(group),method:"PUT",headers: { "Content-Type": "application/json" },})
       .then((response)=>{
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -156,7 +157,7 @@ useEffect(() => {
     
   };
   function populateGroupChat(group){
-    fetch(`http://localhost:8080/api/mess/groupMessages?groupId=${group.id}`)
+    fetch(`http://localhost:8080/api/mess/groupMessages?groupId=${group.id}&username=${username}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -164,14 +165,14 @@ useEffect(() => {
       return response.json();
     })
     .then((messages) => {
-      console.log("📜 Loaded previous messages:", messages);
+      console.log("Loaded previous messages:", messages);
 
       setChatMessages((prev) => ({
         ...prev,
         [group.id]: messages,
       }));
     })
-    .catch((error) => console.error("❌ Error fetching previous group messages:", error));
+    .catch((error) => console.error(" Error fetching previous group messages:", error));
   }
 
    ///metoda kojom kupim detalje o poslednjoj poruci iz ceta kako bih prikazala vrijeme kad je poslata 
@@ -204,6 +205,28 @@ useEffect(() => {
     }
   }, [chats]); 
 
+
+  ///dodavanje clana u grupu 
+  function addMember(){
+    fetch(`http://localhost:8080/api/mess/addMember?username=${friend}&groupId=${selectedGroup.id}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setMemberAdding(false);
+      setFriend('');
+      return response.json();
+    })
+  
+  
+    .catch((error) => console.error("Error adding new member to group:", error));
+
+  }
+
+  //otvori prozor za dodavanje clana
+  function openMemberAdding(){
+    setMemberAdding(true);
+  }
   ///konekcija sa web socketom
   useEffect(() => {
     const socket = new SockJS("http://localhost:8080/socket");
@@ -539,9 +562,10 @@ return (
   </div>
 {chatOpen && (
   <div className={styles.second}>
+    { !selectedGroup  && (<span className={styles.chatWindow1}> Chat with {chatSelected}</span>) }
     { !selectedGroup && (
     <div className={styles.chatWindow}>
-      Chat with {chatSelected}
+     
       {(chatMessages[chatSelected] || []).filter(
               (msg) =>
                 (msg.senderUsername === username && msg.receiverUsername === chatSelected) ||
@@ -558,9 +582,25 @@ return (
             ))}
 
     </div> )}
+    { selectedGroup && ( <span className={styles.chatWindow1}>Chat with {selectedGroup.groupName} <button onClick={openMemberAdding}>add</button></span> )}
+    {memberAdding && <div> <select
+            id="friend-select"
+            value={friend}
+            onChange={(e) => setFriend(e.target.value)}
+            className={styles.friendSelect}
+          >
+            <option value="">Select a friend</option>
+            {friends
+        .filter(friend => 
+          !selectedGroup.members.some(member => member.memberUsername === friend)
+        )
+        .map((friend, index) => (
+          <option key={index} value={friend}>{friend}</option>
+        ))}
+          </select> <button onClick={addMember}>Add</button></div>}
     { selectedGroup && (
     <div className={styles.chatWindow}>
-      Chat with {selectedGroup.groupName}
+      
       {(chatMessages[selectedGroup.id] || []).map((msg, index) => (
       <div
         key={index}
