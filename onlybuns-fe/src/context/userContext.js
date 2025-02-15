@@ -5,7 +5,11 @@ const UserContext = createContext();
 
 // UserProvider-om obavijamo aplikaciju u index.js tako da se kontekst prenese na sve pod elemente
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // pocetno stanje za usera je null a setUser je zapravo funkcija
+ const [user, setUser] = useState(() => {        ///morala sam ovo da promijenim jer je na refresh uzimao null
+  const storedUser = localStorage.getItem("user");
+  return storedUser ? JSON.parse(storedUser) : null;
+});
+
   const [token, setToken] = useState(null); // isto to za JWT
 
   useEffect(() => {
@@ -24,6 +28,7 @@ export const UserProvider = ({ children }) => {
       // Update the user details in localStorage whenever the user changes
       localStorage.setItem('user', JSON.stringify(user));
     }
+    
   }, [user]); // Dependency on user state
 
   // Slava GPT-u ^^^^

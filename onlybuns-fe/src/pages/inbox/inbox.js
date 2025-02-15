@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useUser } from '../../context/userContext';
 import im  from '../../assets/images/nature.jpg'; 
 import groupimg  from '../../assets/images/groupimg.png'; 
+import userim  from '../../assets/icons/user.png'; 
 import send from '../../assets/icons/send-message.png'
 import neww  from '../../assets/icons/circle.png'; 
 import newGroup  from '../../assets/icons/add-group.png'; 
@@ -25,8 +26,7 @@ function InboxPage() {
   const [privateChats, setPrivateChats] = useState(true);
   const [chatDetails, setChatDetails] = useState({});
   const [groupChatMess, setGroupChatMess] = useState(false);
-  
-  const { user, token } = useUser();
+  const { user, token } = useUser();  
   const username = user ?.username;
   const [groupMembers, setGroupMembers] = useState([]); 
   const [groups, setGroups] = useState([]); 
@@ -41,7 +41,7 @@ function InboxPage() {
   const[friends, setFr] = useState([]); 
   const[chats, setC] = useState([]);
 
-
+  
 
   ///metoda kojom dobavljam sve one koje moj user prati
 useEffect(() => {
@@ -96,25 +96,34 @@ useEffect(() => {
   }
 
   ///metoda koju pozivam za kreiranje nove grupe
-  function makeGroup(){
-    const group = {
-      admin: user.username,
-      groupName: selectedGroupName,
-
-    };
-    const usersParam = groupMembers.join(","); 
-    fetch(`http://localhost:8080/api/mess/newGroup?users=${encodeURIComponent(usersParam)}`, {body:JSON.stringify(group),method:"PUT",headers: { "Content-Type": "application/json" },})
-      .then((response)=>{
+    function makeGroup() {
+      const group = {
+        admin: user.username,
+        groupName: selectedGroupName,
+      };
+    
+      const usersParam = groupMembers.join(",");
+      
+      fetch(`http://localhost:8080/api/mess/newGroup?users=${encodeURIComponent(usersParam)}`, {
+        body: JSON.stringify(group),
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
-        
-      }).catch((error) => console.error("Error creating new group:", error));
-    setSelectedGroupName('');
-    setFlagGroupChat(false);
-    setGroupMembers([]);
-  }
+      })
+      .then((newGroup) => {
+        setGroups((prevGroups) => [...prevGroups, newGroup]);   //automatsko dodavanje nove grupe
+        setSelectedGroupName('');
+        setGroupMembers([]);
+        setFlagGroupChat(false);
+      })
+      .catch((error) => console.error("Error creating new group:", error));
+    }
+    
 
   ///metoda kojom oznacavam da su poruke u odredjenom cetu procitane
   function markRead(){
@@ -542,7 +551,7 @@ return (
     { privateChats && (<div>{chats.map((chat) => (
       <div  key={chat}    className={`${styles.mmessage}  ${chatDetails[chat]?.read ? styles.read : styles.unread}`} onClick={() => OpenChat(chat)}>
       
-        <img src={im} className={styles.prof}></img>
+        <img src={userim} className={styles.prof}></img>
         {chat}
         <span className={styles.dat}>{formatDateTime(chatDetails[chat]?.dateTime)}</span>
         { !chatDetails[chat]?.read && (
@@ -575,7 +584,8 @@ return (
                 key={index}
                 className={msg.senderUsername === username ? styles.sentMessage : styles.receivedMessage}
               >
-                <p>{msg.senderUsername} : </p>
+               <div className={styles.slikaiime}><img src={userim} className={styles.profff}></img>
+                <p>{msg.senderUsername} : </p> </div>
                 <p>{msg.content}</p>
                 <span>{new Date(msg.time).toLocaleTimeString()}</span>
               </div>
@@ -606,7 +616,11 @@ return (
         key={index}
         className={msg.senderUsername === username ? styles.sentMessage : styles.receivedMessage}
       >
-        <p><strong>{msg.senderUsername}:</strong> {msg.content}</p>
+
+<div className={styles.slikaiime}><img src={groupimg} className={styles.profff}></img>
+                <p>{msg.senderUsername} : </p> </div>
+                <p>{msg.content}</p>
+       
         <span>{new Date(msg.time).toLocaleTimeString()}</span>
       </div>
     ))}
