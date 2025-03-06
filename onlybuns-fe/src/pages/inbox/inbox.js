@@ -19,7 +19,9 @@ function InboxPage() {
 
   const subscriptionRef = useRef(null);
   const [chatMessages, setChatMessages] = useState({}); 
+  const [memberss, setMemberss] = useState([]); 
   const[memberAdding, setMemberAdding] = useState (false);
+  const[seeMembers, setSeeMembers] = useState (false);
   const [messageStatus, setMessageStatus] = useState('');
   const [selectedGroupName, setSelectedGroupName] = useState('');
   const [flagGroupChat, setFlagGroupChat] = useState(false);
@@ -93,6 +95,19 @@ useEffect(() => {
     setFlagGroupChat(!flagGroupChat);
     setSelectedGroupName('');
     setGroupMembers([]);
+  }
+
+  function seeMembersFunc(){
+    setSeeMembers(!seeMembers);
+    fetch(`http://localhost:8080/api/mess/getGroupMembers?groupId=${selectedGroup.id}`, {
+      method: "GET",
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    }).then((members)=>setMemberss(members))
   }
 
   ///metoda koju pozivam za kreiranje nove grupe
@@ -199,6 +214,7 @@ useEffect(() => {
         const detailsMap = {};
         chats.forEach((chat, index) => {
           detailsMap[chat] = responses[index];
+          if (detailsMap[chat].senderUsername === username ){ detailsMap[chat].read = true;}
         });
   
         setChatDetails(detailsMap);
@@ -226,10 +242,12 @@ useEffect(() => {
       setFriend('');
       return response.json();
     })
-  
-  
     .catch((error) => console.error("Error adding new member to group:", error));
+  }
 
+  function closeaddMember(){
+    setMemberAdding(false);
+    setFriend('');
   }
 
   //otvori prozor za dodavanje clana
@@ -424,10 +442,12 @@ useEffect(() => {
         body: JSON.stringify(message),
         
       });
+      setSelectedMssg('');
     } catch (error) {
       console.error("Error sending message:", error);
       setMessageStatus("Error sending message...");
     }
+    
   };
 ////metoda kojom saljem poruku na grupni cet
   const sendGroupMessage = () => {
@@ -460,10 +480,12 @@ useEffect(() => {
         body: JSON.stringify(message),
         
       });
+      setSelectedMssg('');
     } catch (error) {
       console.error(" Error sending message:", error);
       setMessageStatus("Error sending message...");
     }
+    
   };
 
   //metoda kojom formatiram datum i vrijeme za prikaz
@@ -582,17 +604,26 @@ return (
             ).map((msg, index) => (
               <div
                 key={index}
-                className={msg.senderUsername === username ? styles.sentMessage : styles.receivedMessage}
+                className={msg.senderUsername === username ? styles.sm : styles.rm}
               >
                <div className={styles.slikaiime}><img src={userim} className={styles.profff}></img>
                 <p>{msg.senderUsername} : </p> </div>
+                <div  className={msg.senderUsername === username ? styles.sentMessage : styles.receivedMessage}>
                 <p>{msg.content}</p>
                 <span>{new Date(msg.time).toLocaleTimeString()}</span>
+                </div>
               </div>
             ))}
 
     </div> )}
-    { selectedGroup && ( <span className={styles.chatWindow1}>Chat with {selectedGroup.groupName} <button onClick={openMemberAdding}>add</button></span> )}
+    { selectedGroup && ( <span className={styles.chatWindow1}>Chat with {selectedGroup.groupName} <button  onClick={openMemberAdding}>add</button> <button onClick={seeMembersFunc}>see members</button></span> )}
+    {seeMembers && <div className={styles.membersList}>
+      <button onClick={seeMembersFunc}> X</button>
+      {memberss.map((memberr) => 
+      <p>{memberr}</p>
+      )}
+
+    </div> }
     {memberAdding && <div> <select
             id="friend-select"
             value={friend}
@@ -607,26 +638,27 @@ return (
         .map((friend, index) => (
           <option key={index} value={friend}>{friend}</option>
         ))}
-          </select> <button onClick={addMember}>Add</button></div>}
+          </select> <button onClick={addMember}>Add</button> <button onClick={closeaddMember}>Cancel</button></div>}
     { selectedGroup && (
     <div className={styles.chatWindow}>
       
       {(chatMessages[selectedGroup.id] || []).map((msg, index) => (
       <div
         key={index}
-        className={msg.senderUsername === username ? styles.sentMessage : styles.receivedMessage}
+        className={msg.senderUsername === username ? styles.sm : styles.rm}
       >
 
 <div className={styles.slikaiime}><img src={groupimg} className={styles.profff}></img>
                 <p>{msg.senderUsername} : </p> </div>
-                <p>{msg.content}</p>
-       
-        <span>{new Date(msg.time).toLocaleTimeString()}</span>
+                <div  className={msg.senderUsername === username ? styles.sentMessage : styles.receivedMessage} >
+                    <p>{msg.content}</p>
+                    <span>{new Date(msg.time).toLocaleTimeString()}</span>
+                 </div>
       </div>
     ))}
 
     </div> )}
-    <div> { selectedGroup &&(<div className={styles.inputmess}> <input type="text" placeholder="Write your message..." onChange={(e) => setSelectedMssg(e.target.value)}></input>  <button onClick={sendGroupMessage} > <img src={send}></img></button></div> )} { !selectedGroup &&(<div className={styles.inputmess}> <input type="text" placeholder="Write your message..." onChange={(e) => setSelectedMssg(e.target.value)}></input>  <button onClick={sendMessage} > <img src={send}></img></button></div> )}</div>
+    <div> { selectedGroup &&(<div className={styles.inputmess}> <input type="text"    value={selectedMssg} placeholder="Write your message..." onChange={(e) => setSelectedMssg(e.target.value)}></input>  <button onClick={sendGroupMessage} > <img src={send}></img></button></div> )} { !selectedGroup &&(<div className={styles.inputmess}> <input type="text"  value={selectedMssg}  placeholder="Write your message..." onChange={(e) => setSelectedMssg(e.target.value)}></input>  <button onClick={sendMessage} > <img src={send}></img></button></div> )}</div>
   </div>
 )}
 
@@ -647,7 +679,7 @@ return (
           </select>
         </div>
         <div className={styles.second2}>
-          <textarea type="text" placeholder="Write your message..." className={styles.messageInput} onChange={(e) => setSelectedMssg(e.target.value)}/>
+          <textarea type="text" placeholder="Write your message..." value={selectedMssg} className={styles.messageInput} onChange={(e) => setSelectedMssg(e.target.value)}/>
         </div>
         <div><button onClick={sendMessage}>Send</button>
         </div>
