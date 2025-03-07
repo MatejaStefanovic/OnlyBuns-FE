@@ -24,13 +24,13 @@ const AnalyticsPage = () => {
 
   const [data, setData] = useState(null);
   
-  const [postsWeekly, setPW] = useState(1);
-  const [postsMonthly, setPM] = useState(1);
-  const [postsYearly, setPY] = useState(1);
+  const [postsWeekly, setPW] = useState(0);
+  const [postsMonthly, setPM] = useState(0);
+  const [postsYearly, setPY] = useState(0);
 
-  const [commentsWeekly, setCW] = useState(1);
-  const [commentsMonthly, setCM] = useState(1);
-  const [commentsYearly, setCY] = useState(1);
+  const [commentsWeekly, setCW] = useState(0);
+  const [commentsMonthly, setCM] = useState(0);
+  const [commentsYearly, setCY] = useState(0);
 
 
   useEffect(() => {
