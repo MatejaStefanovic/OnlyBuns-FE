@@ -77,7 +77,7 @@ function CreatePost() {
   };
 
   const fetchLocation = async (lat, lng) => {
-    const apiKey = 'f915ad90ad804f96aaea9b30c818d1ab';
+    const apiKey = 'c9514f3f109d49aaaf3d7dc0a79ed9f3';
     const response = await fetch(
       `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
     );
