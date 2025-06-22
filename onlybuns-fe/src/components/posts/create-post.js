@@ -18,11 +18,11 @@ function CreatePost() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [coordinates, setCoordinates] = useState(null);
-  const [location, setLocation] = useState({
-    city: '',
-    country: '',
-    street: '',
-  });
+  // const [location, setLocation] = useState({
+  //   city: '',
+  //   country: '',
+  //   street: '',
+  // });
 
 
   const { user, token } = useUser();
@@ -43,11 +43,10 @@ function CreatePost() {
     const formData = new FormData();
     formData.append('description', description);
     formData.append('image', image);
-    if (location) {
-      formData.append('city', location.city);
-      formData.append('country', location.country);
-      formData.append('street', location.street);
-    }
+    if (coordinates) {
+    formData.append('latitude', coordinates.lat);
+    formData.append('longitude', coordinates.lng);
+  }
     if (user) {
       formData.append('email', user.email); // Add user data to formData
     }
@@ -65,52 +64,53 @@ function CreatePost() {
         setDescription('');
         setImage(null);
         setImagePreview(null);
-        setLocation({
-          city: '',
-          country: '',
-          street: '',
-        });
+        // setLocation({
+        //   city: '',
+        //   country: '',
+        //   street: '',
+        // });
       })
       .catch((error) => {
         console.error('Error creating post:', error);
       });
   };
 
-  const fetchLocation = async (lat, lng) => {
-    const apiKey = 'c9514f3f109d49aaaf3d7dc0a79ed9f3';
-    const response = await fetch(
-      `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
-    );
-    const data = await response.json();
-    if (data.results.length > 0) {
-      const components = data.results[0].components;
-      setCoordinates({ lat, lng });
-      setLocation({
-        city: components.city || components.town || components.village || '',
-        country: components.country || '',
-        street: components.road || ''
-      });
-    } else {
-      setCoordinates(null);
-      setLocation({
-        city: '',
-        country: '',
-        street: ''
-      });
-    }
-  };
+  // const fetchLocation = async (lat, lng) => {
+  //   const apiKey = 'c9514f3f109d49aaaf3d7dc0a79ed9f3';
+  //   const response = await fetch(
+  //     `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
+  //   );
+  //   const data = await response.json();
+  //   if (data.results.length > 0) {
+  //     const components = data.results[0].components;
+  //     setCoordinates({ lat, lng });
+  //     setLocation({
+  //       city: components.city || components.town || components.village || '',
+  //       country: components.country || '',
+  //       street: components.road || ''
+  //     });
+  //   } else {
+  //     setCoordinates(null);
+  //     setLocation({
+  //       city: '',
+  //       country: '',
+  //       street: ''
+  //     });
+  //   }
+  // };
 
   function LocationMarker() {
-    useMapEvents({
-      click(e) {
-        fetchLocation(e.latlng.lat, e.latlng.lng);
-      },
-    });
+  useMapEvents({
+    click(e) {
+      // Samo sačuvaj koordinate, bez API poziva
+      setCoordinates({ lat: e.latlng.lat, lng: e.latlng.lng });
+    },
+  });
 
-    return coordinates === null ? null : (
-      <Marker position={[coordinates.lat, coordinates.lng]}></Marker>
-    );
-  }
+  return coordinates === null ? null : (
+    <Marker position={[coordinates.lat, coordinates.lng]}></Marker>
+  );
+}
 
   return (
     <form onSubmit={handleSubmit} className="create-post-form">
