@@ -13,32 +13,12 @@ function PostsView() {
     const { user, token } = useUser();
     const navigate = useNavigate();
     const username = user ?.username;
+    const id = user ?.id;
     const userRole = user ?.role;
    
     // async function addComment(postId, commentText) {
     //     if (!commentText.trim()) return;
 
-    //     try {
-    //         await fetch(`http://localhost:8080/api/posts/${postId}/comment?username=${username}&description=${commentText}`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Authorization': `Bearer ${token}`, 
-    //             }
-    //         });
-
-    //         setPosts(posts.map(post =>
-    //             post.id === postId
-
-    //                 ? {
-    //                     ...post,
-    //                     comments: [...post.comments, { description: commentText, user: { username } }],
-    //                 }
-    //                 : post
-    //         ));
-    //     } catch (error) {
-    //         console.error("Error adding comment:", error);
-    //     }
-    // }
     async function addComment(postId, commentText) {
         if (!commentText.trim()) return;
     
@@ -139,7 +119,13 @@ function PostsView() {
     useEffect(() => {
         async function fetchPosts() {
             try {
-                const response = await fetch("http://localhost:8080/api/posts/all", {
+               /* const response = await fetch("http://localhost:8080/api/posts/all", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                    }
+                });*/
+                const response = await fetch(`http://localhost:8080/api/posts/allFollowing?username=${username}`, {
+                    method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`, 
                     }
@@ -147,20 +133,16 @@ function PostsView() {
                 if (!response.ok) throw new Error('Failed to fetch posts');
                 const data = await response.json();
     
-                // Debugging: Log each post's likesList to verify its structure
-                data.forEach(post => {
-                    console.log(`Post ID: ${post.id}, Likes List:`, post.likesList);
-                });
-    
+                
                 // Sort and map posts to include isLiked based on likesList
                 const sortedPosts = data
                     .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
                     .map(post => {
                         const isLiked = post.likesList?.some(like => like.user.username === username);
                         console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
-                        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+                        const isFollowed = post.user.followers?.some(follower => follower === username) ?? false;
                         post.user.followers.forEach(follower => {
-                            console.log(`Follower username: ${follower.username}`);
+                            console.log(`Follower username: ${follower}`);
                         });
                         return {
                             ...post,
@@ -248,57 +230,7 @@ function PostsView() {
             navigate(`/edit`, { state: { post } });
         }
 
-    // async function toggleLike(postId) {
-    //     setPosts(posts.map(post =>
-    //         post.id === postId ? { ...post, isLiked: !post.isLiked } : post
-    //     ));
-
-    //     const post = posts.find(p => p.id === postId);
-    //     const hasLiked = post.isLiked;
-
-    //     try {
-    //         if (hasLiked) {
-
-    //             await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=-1`, {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Authorization': `Bearer ${token}`, 
-    //                 }
-    //             });
-
-    //             setPosts(posts.map(p =>
-    //                 p.id === postId
-    //                     ? {
-    //                         ...p,
-    //                         likes: p.likes - 1,
-    //                         likesList: p.likesList.filter(like => like.username !== username),
-    //                         isLiked: false,
-    //                     }
-    //                     : p
-    //             ));
-    //         } else {
-    //             await fetch(`http://localhost:8080/api/posts/${postId}/like?username=${username}&flag=1`, {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Authorization': `Bearer ${token}`, 
-    //                 }
-    //             });
-    //             setPosts(posts.map(p =>
-    //                 p.id === postId
-    //                     ? {
-    //                         ...p,
-    //                         likes: p.likes + 1,
-    //                         likesList: [...p.likesList, { username }],
-    //                         isLiked: true,
-    //                     }
-    //                     : p
-    //             ));
-    //         }
-    //     } catch (error) {
-    //         console.error("Error toggling like:", error);
-    //     }
-    // }
-
+   
     async function toggleLike(postId) {
         // Pronađi post iz stanja
         const post = posts.find(p => p.id === postId);

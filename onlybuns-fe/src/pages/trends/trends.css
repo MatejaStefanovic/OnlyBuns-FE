@@ -1,0 +1,123 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #1f1f1f; /* Night city vibe */
+  color: #e0e0e0; /* Light gray text for readability */
+}
+
+/* Header Container */
+.header-container {
+  background-color: #292929; /* Darker header for contrast */
+  padding: 10px 20px;
+  border-bottom: 2px solid #444;
+}
+
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.button-group button {
+  background-color: #333;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button-group button:hover {
+  background-color: #555;
+  color: #ffffff;
+}
+
+.button-group button.active {
+  background-color: #6200ea; /* Accent color */
+  color: #ffffff;
+}
+
+/* Card Container */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Individual Card */
+.individual-card {
+  background-color: #292929;
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.individual-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Card Header */
+.card-header {
+  padding: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.card-title {
+  font-size: 18px;
+  color: #ffffff;
+  margin: 0 0 5px;
+}
+
+.card-date {
+  font-size: 14px;
+  color: #aaa;
+  margin: 0;
+}
+
+/* Card Image */
+.card-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Card Details */
+.card-details {
+  padding: 15px;
+}
+
+.card-details p {
+  margin: 5px 0;
+  color: #e0e0e0;
+}
+
+.card-details strong {
+  color: #ffffff;
+}
+
+/* Most Active Users */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+ul li {
+  background-color: #292929;
+  border: 1px solid #444;
+  border-radius: 5px;
+  margin: 10px 0;
+  padding: 10px 15px;
+  color: #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}

@@ -7,9 +7,10 @@ import rab2 from '../../assets/images/rab2.jpg';
 import rab3 from '../../assets/images/rab3.jpg';
 import rab4 from '../../assets/images/rab4.jpg';
 import sort from '../../assets/images/sort.png';
-import '../home/home.css';
+import '../home/home.module.css';
 import SideBar from '../../components/sidebar/sidebar';
 import { useUser } from '../../context/userContext'; 
+import { useNavigate } from 'react-router-dom';
 /*const users = [
     { name: 'John', lastName: 'Doe', email: 'john.doe@example.com', numberOfPosts: 5, numberOfFollowings: 10 },
     { name: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', numberOfPosts: 8, numberOfFollowings: 15 },
@@ -26,6 +27,7 @@ function AdminList() {
     console.log("AdminList rendered");
     const [users, setUsers] = useState([]);
     const { user, token } = useUser();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -124,11 +126,11 @@ function AdminList() {
                 <div className="center-container">
                     <h1>List of Registered Users</h1>
                 </div>
-                <div className="buttons">
-                    <button onClick={prevPage} disabled={currentPage === 0}>
+                <div className="buttttons">
+                    <button className="vb" onClick={prevPage} disabled={currentPage === 0}>
                         <img src={img} className="ii" alt="Prev" />
                     </button>
-                    <button onClick={nextPage} disabled={currentPage === pages - 1}>
+                    <button className="vb" onClick={nextPage} disabled={currentPage === pages - 1}>
                         <img src={img} alt="Next" />
                     </button>
                 </div>
@@ -136,6 +138,7 @@ function AdminList() {
                     <table>
                         <thead>
                             <tr>
+     
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Number of Posts</th>
@@ -145,7 +148,10 @@ function AdminList() {
                         <tbody>
                             {showUsers.map((user, index) => (
                                 <tr key={index}>
-                                    <td>{user.firstName} {user.lastName}</td>
+                                   
+                                    <td className ="nameU" onClick={() => navigate(`/profile/${user.username}`)}
+                                                                style={{ cursor: 'pointer' }} 
+                                                            >{user.firstName} {user.lastName}</td>
                                     <td>{user.email}</td>
                                     <td>{user.numberOfPosts}</td>
                                     <td>{user.numberOfFollowing}</td>
