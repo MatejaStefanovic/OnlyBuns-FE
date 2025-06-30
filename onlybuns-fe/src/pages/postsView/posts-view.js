@@ -14,6 +14,8 @@ function PostsView() {
     const navigate = useNavigate();
     const username = user ?.username;
     const userRole = user ?.role;
+    const [likeCounts, setLikeCounts] = useState(new Map());
+    const [postLikeUsers, setPostLikeUsers] = useState([]);
    
     // async function addComment(postId, commentText) {
     //     if (!commentText.trim()) return;
@@ -136,47 +138,133 @@ function PostsView() {
       
       
 
-    useEffect(() => {
-        async function fetchPosts() {
-            try {
-                const response = await fetch("http://localhost:8080/api/posts/all", {
-                    headers: {
-                        'Authorization': `Bearer ${token}`, 
-                    }
-                });
-                if (!response.ok) throw new Error('Failed to fetch posts');
-                const data = await response.json();
+    // useEffect(() => {
+    //     async function fetchPosts() {
+    //         try {
+    //             const response = await fetch("http://localhost:8080/api/posts/all", {
+    //                 headers: {
+    //                     'Authorization': `Bearer ${token}`, 
+    //                 }
+    //             });
+    //             if (!response.ok) throw new Error('Failed to fetch posts');
+    //             const data = await response.json();
     
-                // Debugging: Log each post's likesList to verify its structure
-                data.forEach(post => {
-                    console.log(`Post ID: ${post.id}, Likes List:`, post.likesList);
-                });
+    //             // Debugging: Log each post's likesList to verify its structure
+    //             data.forEach(post => {
+    //                 console.log(`Post ID: ${post.id}, Likes List:`, post.likesList);
+    //             });
     
-                // Sort and map posts to include isLiked based on likesList
-                const sortedPosts = data
-                    .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
-                    .map(post => {
-                        const isLiked = post.likesList?.some(like => like.user.username === username);
-                        console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
-                        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
-                        post.user.followers.forEach(follower => {
-                            console.log(`Follower username: ${follower.username}`);
-                        });
-                        return {
-                            ...post,
-                            isLiked,
-                            isFollowed
-                            };
-                    });
+    //             // Sort and map posts to include isLiked based on likesList
+    //             const sortedPosts = data
+    //                 .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
+    //                 .map(post => {
+    //                     const isLiked = post.likesList?.some(like => like.user.username === username);
+    //                     console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
+    //                     const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+    //                     post.user.followers.forEach(follower => {
+    //                         console.log(`Follower username: ${follower.username}`);
+    //                     });
+    //                     return {
+    //                         ...post,
+    //                         isLiked,
+    //                         isFollowed
+    //                         };
+    //                 });
     
-                setPosts(sortedPosts); 
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
+    //             setPosts(sortedPosts); 
+    //         } catch (error) {
+    //             console.error("Error fetching posts:", error);
+    //         }
+    //     }
+    
+    //     fetchPosts();
+    // }, [token, username]);
+
+async function fetchLikeCounts(postIds, token) {
+  const countsMap = new Map();
+
+  for (const postId of postIds) {
+    try {
+      const response = await fetch(`http://localhost:8080/api/post-like-users/post/${postId}/count`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-    
-        fetchPosts();
-    }, [token, username]);
+      });
+
+      if (response.ok) {
+        const count = await response.json();
+        countsMap.set(postId, count);
+      } else {
+        console.warn(`Failed to fetch like count for post ${postId}`);
+        countsMap.set(postId, 0);
+      }
+    } catch (error) {
+      console.error(`Error fetching like count for post ${postId}:`, error);
+      countsMap.set(postId, 0);
+    }
+  }
+
+  return countsMap;
+}
+
+   async function fetchPostLikeUsers(token) {
+    try {
+        const response = await fetch("http://localhost:8080/api/post-like-users/all", {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch post-like users');
+        const data = await response.json();
+        return data; // ✅ ovo koristi direktno u fetchPosts
+    } catch (error) {
+        console.error("Error fetching post-like users:", error);
+        return []; // fallback ako dođe do greške
+    }
+}
+
+ 
+
+    useEffect(() => {
+    async function fetchPosts() {
+        try {
+            const response = await fetch("http://localhost:8080/api/posts/all", {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+            if (!response.ok) throw new Error('Failed to fetch posts');
+            const posts = await response.json();
+
+            const postIds = posts.map(post => post.id);
+            const likeCountMap = await fetchLikeCounts(postIds,token);
+            const postLikeUsers = await fetchPostLikeUsers(token);
+            const mapped = posts.map(post => {
+                const isLiked = postLikeUsers.some(
+                    like => like.post.id === post.id && like.username === username
+                );
+                const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+                //const likeCount = likeCountMap.get(post.id) ?? 0;
+                const likeCount = likeCountMap.get(post.id) ?? 0;
+                return {
+                    ...post,
+                    isLiked,
+                    isFollowed,
+                    likeCount
+                };
+            });
+
+            const sorted = mapped.sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime));
+            setPosts(sorted);
+
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+        }
+    }
+
+    fetchPosts();
+}, [token, username]);
+
     
     async function followUser(user){
         try {
@@ -327,15 +415,15 @@ function PostsView() {
           }
       
           // Dobij ažurirani post sa backend-a
-          const updatedPost = await response.json();
+          const result = await response.json();
       
           // Proveri da li je korisnik lajkovao post
-        const isLiked = updatedPost.likesList.some(like => like.user.username === username);
+        const isLiked = result === 1;
       
           // Ažuriraj stanje sa ispravnom vrednošću `isLiked`
           setPosts(posts.map(p => 
             p.id === postId 
-              ? { ...updatedPost, isLiked } // Dodaj `isLiked` bazirano na `likesList`
+              ? { ...post, isLiked, likeCount: isLiked? p.likeCount +1 : p.likeCount - 1 } // Dodaj `isLiked` bazirano na `likesList`
               : p
           ));
         } catch (error) {
@@ -433,7 +521,7 @@ function PostsView() {
                         </p>
                         <div className={styles.lajkovi}>
 
-                            <p>{post.likes}</p>
+                            <p>{post.likeCount}</p>
                             <div className={styles.lajk}>
                                 {user ? (
                                     <img
