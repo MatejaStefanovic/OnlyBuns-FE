@@ -1,0 +1,274 @@
+.buttonss{
+    display: flex;
+    flex-direction: row;
+    width:100%;
+}
+
+.chatWindow{
+    overflow-y: auto;
+    height:84vh;
+}
+.chatWindow1{
+   height:1%;
+    background-color: white;
+    width:100%;
+    position:relative;
+}
+
+
+.b{
+    width:100%;
+    background-color:rgb(98, 104, 102);
+}
+.bu{
+    margin-top:2%;
+    width:8%;
+    background-color:rgb(98, 104, 102);
+}
+.sentMessage img{
+    opacity:0.1;
+}
+.bu img{
+    width:100%;
+   
+    height:100%;
+}
+.b:hover{
+    background-color: rgb(40, 124, 163);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+.b:active{
+    background-color: rgb(40, 124, 163);
+}
+.bu:hover{
+    background-color: rgb(40, 124, 163);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+.bu:active{
+    background-color: rgb(40, 124, 163);
+}
+.unread{
+    border: 5px solid rgb(45, 109, 205);
+}
+.read{
+    border: 1px solid rgb(238, 243, 250);
+}
+.prof{
+    height:100%;
+    margin-right:10%;
+    width:10%;
+    border-radius: 40%;
+    
+}
+
+.profff{
+    height:10%;
+    margin-right:10%;
+    width:5%;
+    border-radius: 40%;
+    margin-top:3%;
+    margin-right:1%;
+    
+}
+.slikaiime{
+    display: flex;
+    flex-direction:row;
+    margin-top: 9%;
+}
+.mmessage{
+    background-color:white;
+    position: relative;
+    margin:2%;
+    color:black;
+    border-radius: 4%;
+    width:60%;
+    padding:0.5%;
+    height:5%;
+    margin-left:10%;
+}
+
+.unread{
+    border: 5px solid rgb(45, 109, 205);
+    background-color:white;
+    margin:2%;
+    color:black;
+    border-radius: 4%;
+    width:59%;
+    margin-left:10%;
+}
+.mmessage:hover{
+    transform: scale(1.05);
+}
+.inb{
+    width:100%;
+    max-height:94.2vh;
+    overflow-y: auto;
+}
+.whole{
+    width:100%;
+    display: flex;
+    flex-direction: row;
+   
+}
+.second{
+    background-color: whitesmoke;
+    width:100%;
+    color:black;
+    display: flex;
+    flex-direction: column;
+}
+.second1 {
+    background-color: whitesmoke;
+    width: 100%;
+   
+    color: black;
+    border: 1px solid gray;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+  
+  .second1 label {
+    margin-right: 10px;
+  }
+  
+  .friendSelect {
+    flex-grow: 1;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid gray;
+  }
+  .second input{
+    background-color: white;
+    color:black;
+  }
+  .second2 {
+    background-color: whitesmoke;
+   
+    width: 100%;
+    height:90%;
+    color: black;
+    border: 1px solid gray;
+    padding: 5px;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .messageInput {
+    width: 100%;
+    height:90%;
+    
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid gray;
+    border-radius: 5px;
+  }
+
+.neww{
+    height:100%;
+    right:10px;
+    position:absolute;
+    filter: contrast(1.5) saturate(1.5);
+    width:10%;
+}
+.active-tab {
+    background-color: rgb(20, 90, 150);
+    color: white;
+    font-weight: bold;
+}
+.dat{
+    font-size: xx-small;
+    color: gray;
+    margin-left:15%;
+
+}
+
+.inputmess{
+    display: flex;
+    flex-direction: row;
+}
+.inputmess img{
+    height:10px;
+    width: 10px;
+}
+
+.membersList{
+    position: fixed;
+    z-index: 995;
+    background-color: rgb(187, 178, 178);
+    top: 50%; 
+    left: 50%; 
+   ;
+   width:20%;
+   height:40%;
+   overflow-y:auto;
+   overflow-x: hidden;
+    transform: translate(-50%, -50%); 
+    display: flex;
+    flex-direction: column; 
+}
+.membersList button{
+    width:100%;
+}
+.createGroup{
+    position: fixed;
+    z-index: 995;
+    background-color: rgb(187, 178, 178);
+    top: 50%; 
+    left: 50%; 
+   ;
+    transform: translate(-50%, -50%); 
+    display: flex;
+    flex-direction: column;
+}
+.createGroup input{
+    width:90%;
+}
+
+.friendSelect {
+    width: 100%;
+    margin-top:6%;
+    height: auto;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+  }
+  
+  .friendSelect option {
+    padding: 8px;
+    font-size: 14px;
+    background: #f8f8f8;
+    color: #333;
+  }
+  
+  .friendSelect:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  .friendSelect option:checked {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+ .sentMessage{
+    background-color: rgba(131, 170, 200, 0.9);
+    border-radius: 1%;
+
+    margin-top:2%;
+    
+ }
+ .sentMessage span{
+   color:rgb(255, 247, 247);
+   margin-left:80%;
+ }
+ .receivedMessage span{
+    color:gray;
+    margin-left:80%;
+ }
+
+ .sm img{
+    opacity: 0.1;
+ }

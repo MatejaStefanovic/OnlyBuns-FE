@@ -1,14 +1,18 @@
 .content-area{
     display: flex;
     flex-direction: row;
-    overflow-y: hidden;
     overflow-x: hidden;
 }
 .navbar{
     width:80vw;
 }
 
+.sidebar{
+    height:94vh;
+}
+
 .layout-container{
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
+   
 }

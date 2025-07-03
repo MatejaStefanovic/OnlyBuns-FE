@@ -1,5 +1,5 @@
 import React from 'react';
-import '../home/home.css';
+import '../home/home.module.css';
 import CreatePost from '../../components/posts/create-post';
 import './create-post.css';
 
