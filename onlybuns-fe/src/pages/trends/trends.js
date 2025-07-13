@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import './trends.css';
 
 const TrendsPage = () => {
@@ -6,7 +7,7 @@ const TrendsPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   const fetchData = async (section) => {
     setLoading(true);
     setError(null);
@@ -18,7 +19,7 @@ const TrendsPage = () => {
       } else if (section === 'topAllTime') {
         endpoint = 'http://localhost:8080/api/post/trending/allTime';
       } else if (section === 'mostActiveUsers') {
-        endpoint = 'http://localhost:8080/api/trends/mostActiveUsers';
+        endpoint = 'http://localhost:8080/api/post/trending/users/lastWeek';
       }
 
       const response = await fetch(endpoint);
@@ -69,13 +70,49 @@ const TrendsPage = () => {
         {!loading && !error && data.length > 0 && (
           <div>
             {activeSection === "mostActiveUsers" ? (
-              <ul>
-                {data.map((user) => (
-                  <li key={user.id}>
-                    {user.username} - {user.activityCount} actions
-                </li>
-                ))}
-              </ul>
+            <ul>
+              {data && data.length > 0 ? (
+                data.map((item, index) => {
+                  if (!item || !Array.isArray(item) || item.length < 2) {
+                    return null;
+                  }
+                  
+                  const user = item[0];
+                  const likeCount = item[1];
+                  
+                  if (!user || !user.username) {
+                    return null;
+                  }
+                  
+                  return (
+                    <li key={user.id || index} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px',
+                      marginBottom: '5px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}>
+                      <span>{user.username} - Total likes: {likeCount}</span>
+                      <button style={{
+                        padding: '5px 10px',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }} onClick={() => navigate(`/profile/${user.username}`)}
+                      >
+                        Go to profile
+                      </button>
+                    </li>
+                  );
+                })
+              ) : (
+                <li>No active users found</li>
+              )}
+            </ul>
             ) : (
                 <div className="card-container">
                   {data.map((post) => (
