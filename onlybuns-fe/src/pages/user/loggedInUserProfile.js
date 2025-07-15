@@ -16,7 +16,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const CurrentUserProfile = () => {
-  const { user, token } = useUser();
+  const { user, token, setUser } = useUser();
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,14 +25,16 @@ const CurrentUserProfile = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
 
   const [activeSection, setActiveSection] = useState('profile');
 
   const [coordinates, setCoordinates] = useState({
-    lat: user ?.location ?.lat || 51.505,
-    lng: user ?.location ?.lng || -0.09,
+    lat: 51.505,
+    lng: -0.09,
   });
-
+  
   const [userInfo, setUserInfo] = useState({
     username: user ?.username || '',
     firstName: user ?.firstName || '',
@@ -44,15 +46,49 @@ const CurrentUserProfile = () => {
   const [hasChanges, setHasChanges] = useState(false); // To track changes
   const [isLocationChanged, setIsLocationChanged] = useState(false); // To track location change
 
-  const handlePasswordChange = () => {
+const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
-      alert('Passwords do not match!');
-      return;
+        alert('Passwords do not match!');
+        return;
     }
-    console.log('Password updated:', newPassword);
-    setIsEditingPassword(false);
-    setHasChanges(true);
-  };
+    if (newPassword.length < 8) {
+        alert('Password length must be greater than 8!');
+        return;
+    }
+
+    try {
+        const passwordUpdateData = {
+            ...userInfo,
+            password: newPassword
+        };
+        
+        const response = await fetch(`http://localhost:8080/api/users/update/${userInfo.email}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(passwordUpdateData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to update password');
+        }
+        
+        // No need to update user context for password change
+        // as password isn't stored in the user object
+        
+        console.log('Password updated successfully');
+        setIsEditingPassword(false);
+        setNewPassword('');
+        setConfirmPassword('');
+        setHasChanges(false);
+        
+    } catch (error) {
+        console.error('Error updating password:', error);
+        alert('Failed to update password. Please try again.');
+    }
+};
 
   const handleInputChange = (field, value) => {
     setUserInfo((prev) => ({ ...prev, [field]: value }));
@@ -62,14 +98,93 @@ const CurrentUserProfile = () => {
     navigate('/home');
   };
 
-  const handleSaveChanges = () => {
-    console.log('User info updated:', userInfo);
-    setHasChanges(false);
-  };
+const handleSaveChanges = async () => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/users/update/${userInfo.email}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userInfo)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to update user');
+        }
+        
+        const updatedUser = {
+            ...user,
+            username: userInfo.username,
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+        };
+        
+        setUser(updatedUser);
+        
+        console.log('User info updated successfully');
+        setHasChanges(false);
+    } catch (error) {
+        console.error('Error updating user:', error);
+    }
+};
 
-  const handleSaveLocation = () => {
-    console.log('Location saved:', coordinates);
-    setIsLocationChanged(false); // Reset location change state after saving
+const handleSaveLocation = async () => {
+    try {
+        if (!userInfo.location) {
+            alert('Please select a location on the map first.');
+            return;
+        }
+        
+        const response = await fetch(`http://localhost:8080/api/users/update/${userInfo.email}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userInfo)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to update location');
+        }
+        
+        setUser(prevUser => ({
+            ...prevUser,
+            location: userInfo.location
+        }));
+        
+        setIsLocationChanged(false);
+        
+    } catch (error) {
+        console.error('Error updating location:', error);
+        alert('Failed to update location. Please try again.');
+    }
+};
+
+const getCoordinatesFromAddress = async (location) => {
+    if (!location || !location.city || !location.country) {
+      return null;
+    }
+
+    const apiKey = 'c9514f3f109d49aaaf3d7dc0a79ed9f3';
+    const address = `${location.street || ''} ${location.city} ${location.country}`.trim();
+    
+    try {
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=${apiKey}`
+      );
+      const data = await response.json();
+
+      if (data.results && data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry;
+        return { lat, lng };
+      }
+    } catch (error) {
+      console.error('Error geocoding address:', error);
+    }
+    
+    return null;
   };
 
   useEffect(() => {
@@ -80,7 +195,7 @@ const CurrentUserProfile = () => {
       email: user ?.email,
       followerCount: user ?.numberOfFollowing,
     };
-
+    
     const isUserInfoChanged =
       userInfo.username !== initialUserInfo.username ||
       userInfo.firstName !== initialUserInfo.firstName ||
@@ -89,8 +204,50 @@ const CurrentUserProfile = () => {
     setHasChanges(isUserInfoChanged);
     fetchPosts();
   }, [userInfo, user]);
-  const fetchLocation = async (lat, lng) => {
-    const apiKey = 'f915ad90ad804f96aaea9b30c818d1ab';
+
+useEffect(() => {
+  if (user.location && user.location.city && user.location.country) {
+    getCoordinatesFromAddress(user.location).then(coords => {
+      if (coords) {
+        setCoordinates(coords);
+      }
+    });
+  }
+}, [user]);
+
+
+const fetchFollowers = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/followers?username=${userInfo.username}`);
+    const data = await response.json();
+    setFollowers(data);
+  } catch (error) {
+    console.error('Error fetching followers:', error);
+  }
+};
+
+const fetchFollowing = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/following?username=${userInfo.username}`);
+    const data = await response.json();
+    setFollowing(data);
+    console.log("hello");
+    console.log(userInfo.username);
+  } catch (error) {
+    console.error('Error fetching following:', error);
+  }
+};
+
+
+useEffect(() => {
+  if (activeSection === "following") {
+    fetchFollowers();
+    fetchFollowing();
+  }
+}, [activeSection, userInfo]);
+
+const fetchLocation = async (lat, lng) => {
+    const apiKey = 'c9514f3f109d49aaaf3d7dc0a79ed9f3';
     const response = await fetch(
       `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
     );
@@ -102,19 +259,25 @@ const CurrentUserProfile = () => {
       const city = components.city || components.town || components.village;
       const street = components.road || components.neighbourhood;
 
-
       setCoordinates({ lat, lng });
+      
+      const locationObj = { country, city, street };
+      
       setUserInfo((prev) => ({
         ...prev,
-        location: { country, city, street },
+        location: locationObj
       }));
-      setIsLocationChanged(true); // Mark location as changed
+      
+      setIsLocationChanged(true);
+      
+      return locationObj;
     } else {
       setCoordinates({ lat, lng });
-      setIsLocationChanged(true); // Mark location as changed
+      setIsLocationChanged(true);
+      return null;
     }
-  };
-
+}
+;
   const fetchPosts = async () => {
     if (!token || !user.email) {
       setError("Token not available");
@@ -317,13 +480,119 @@ const CurrentUserProfile = () => {
       )}
       
 
-      {/* Followers Section */}
+    {/* Followers Section */}
       {activeSection === "following" && (
         <div className="profile-section">
           <h2>Followers and Following</h2>
-          <p>Followers and Following will be displayed here...</p>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+            <thead>
+              <tr>
+                <th style={{ 
+                  border: '1px solid #ddd', 
+                  padding: '12px', 
+                  backgroundColor: '#f2f2f2',
+                  textAlign: 'left',
+                  width: '50%'
+                }}>
+                  Followers
+                </th>
+                <th style={{ 
+                  border: '1px solid #ddd', 
+                  padding: '12px', 
+                  backgroundColor: '#f2f2f2',
+                  textAlign: 'left',
+                  width: '50%'
+                }}>
+                  Following
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Determine the maximum length to create equal rows */}
+              {Array.from({ 
+                length: Math.max(followers?.length || 0, following?.length || 0) 
+              }).map((_, index) => (
+                <tr key={index}>
+                  <td style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '12px',
+                    verticalAlign: 'top'
+                  }}>
+                    {followers && followers[index] ? (
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                      }}>
+                        <span>{followers[index]}</span>
+                        <button 
+                          style={{
+                            padding: '5px 10px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => navigate(`/profile/${followers[index]}`)}
+                        >
+                          Go to profile
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#999' }}>-</span>
+                    )}
+                  </td>
+                  <td style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '12px',
+                    verticalAlign: 'top'
+                  }}>
+                    {following && following[index] ? (
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                      }}>
+                        <span>{following[index]}</span>
+                        <button 
+                          style={{
+                            padding: '5px 10px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => navigate(`/profile/${following[index]}`)}
+                        >
+                          Go to profile
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#999' }}>-</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {/* Show message if both arrays are empty */}
+              {(!followers || followers.length === 0) && (!following || following.length === 0) && (
+                <tr>
+                  <td colSpan="2" style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '12px',
+                    textAlign: 'center',
+                    color: '#999'
+                  }}>
+                    No followers or following users yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
+
     </div>
   );
 };

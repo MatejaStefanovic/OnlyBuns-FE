@@ -26,9 +26,10 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState('profile');
   const [posts, setPosts] = useState([]);
-  const [isFollowed, setIsFollowed] = useState(false);
+  const [isFollowed, setIsFollowed] = useState(false);  
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
   
-
   useEffect(() => {
     // Fetch user data dynamically if not in context
     const fetchUserData = async () => {
@@ -93,6 +94,36 @@ const ProfilePage = () => {
 
     if (user) fetchPosts();
   }, [user, token]);
+
+
+const fetchFollowers = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/followers?username=${username}`);
+    const data = await response.json();
+    setFollowers(data);
+  } catch (error) {
+    console.error('Error fetching followers:', error);
+  }
+};
+
+const fetchFollowing = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/following?username=${username}`);
+    const data = await response.json();
+    setFollowing(data);
+  } catch (error) {
+    console.error('Error fetching following:', error);
+  }
+};
+
+// Call these functions when needed, e.g., when activeSection changes to "following"
+useEffect(() => {
+  if (activeSection === "following") {
+    fetchFollowers();
+    fetchFollowing();
+  }
+}, [activeSection, username]);
+
 
   const followUser = async () => {
     try {
@@ -239,11 +270,116 @@ async function unfollowUser(){
       )}
       
 
-      {/* Followers Section */}
+    {/* Followers Section */}
       {activeSection === "following" && (
         <div className="profile-section">
           <h2>Followers and Following</h2>
-          <p>Followers and Following will be displayed here...</p>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+            <thead>
+              <tr>
+                <th style={{ 
+                  border: '1px solid #ddd', 
+                  padding: '12px', 
+                  backgroundColor: '#f2f2f2',
+                  textAlign: 'left',
+                  width: '50%'
+                }}>
+                  Followers
+                </th>
+                <th style={{ 
+                  border: '1px solid #ddd', 
+                  padding: '12px', 
+                  backgroundColor: '#f2f2f2',
+                  textAlign: 'left',
+                  width: '50%'
+                }}>
+                  Following
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Determine the maximum length to create equal rows */}
+              {Array.from({ 
+                length: Math.max(followers?.length || 0, following?.length || 0) 
+              }).map((_, index) => (
+                <tr key={index}>
+                  <td style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '12px',
+                    verticalAlign: 'top'
+                  }}>
+                    {followers && followers[index] ? (
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                      }}>
+                        <span>{followers[index]}</span>
+                        <button 
+                          style={{
+                            padding: '5px 10px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => navigate(`/profile/${followers[index]}`)}
+                        >
+                          Go to profile
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#999' }}>-</span>
+                    )}
+                  </td>
+                  <td style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '12px',
+                    verticalAlign: 'top'
+                  }}>
+                    {following && following[index] ? (
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                      }}>
+                        <span>{following[index]}</span>
+                        <button 
+                          style={{
+                            padding: '5px 10px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => navigate(`/profile/${following[index]}`)}
+                        >
+                          Go to profile
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#999' }}>-</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {/* Show message if both arrays are empty */}
+              {(!followers || followers.length === 0) && (!following || following.length === 0) && (
+                <tr>
+                  <td colSpan="2" style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '12px',
+                    textAlign: 'center',
+                    color: '#999'
+                  }}>
+                    No followers or following users yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 

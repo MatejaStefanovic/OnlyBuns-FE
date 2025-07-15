@@ -54,7 +54,7 @@ export const UserProvider = ({ children }) => {
     //Ovo je kontekst koji se prosledjuje, bilo sta od ovoga mozete koristiti,
     // login logout funkcije, isAuthenticated funckiju, samog usera ili token
     // Postoji primer u login-u kako se bas login koristi ako zatreba
-    <UserContext.Provider value={{ user, token, login, logout, isAuthenticated }}> 
+    <UserContext.Provider value={{ user, token, login, logout, isAuthenticated, setUser }}> 
       {children}
     </UserContext.Provider>
   );
