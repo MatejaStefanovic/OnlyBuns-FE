@@ -298,9 +298,15 @@ const CurrentUserProfile = () => {
                   <p>
                     <strong>Likes:</strong> {post.likes}
                   </p>
-                  <p>
-                    <strong>Comments:</strong> {post.comments}
-                  </p>
+                  <div className="comments-list">
+  <strong>Comments:</strong>
+  {post.comments.map((comment, index) => (
+    <div key={index}>
+      <strong>{comment.user.username}:</strong> {comment.description}
+    </div>
+  ))}
+</div>
+
                 </div>
               </div>
             ))

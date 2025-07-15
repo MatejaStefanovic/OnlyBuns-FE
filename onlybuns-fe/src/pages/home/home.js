@@ -77,51 +77,114 @@ function HomePage() {
             console.error("Error adding comment:", error);
         }
     }
-    
+    async function fetchPostLikeUsers(token) {
+    try {
+        const response = await fetch("http://localhost:8080/api/post-like-users/all", {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch post-like users');
+        const data = await response.json();
+        return data; // ✅ ovo koristi direktno u fetchPosts
+    } catch (error) {
+        console.error("Error fetching post-like users:", error);
+        return []; // fallback ako dođe do greške
+    }
+}
 
-    useEffect(() => {
-        async function fetchPosts() {
-            try {
-                const response = await fetch("http://localhost:8080/api/posts/all", {
-                    headers: {
-                        'Authorization': `Bearer ${token}`, 
-                    }
-                });
-                /*const response = await fetch(`http://localhost:8080/api/posts/allFollowing?username=${username}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`, 
-                    }
-                });*/
-                if (!response.ok) throw new Error('Failed to fetch posts');
-                const data = await response.json();
+    // useEffect(() => {
+    //     async function fetchPosts() {
+    //         try {
+    //             const response = await fetch("http://localhost:8080/api/posts/all", {
+    //                 headers: {
+    //                     'Authorization': `Bearer ${token}`, 
+    //                 }
+    //             });
+    //             /*const response = await fetch(`http://localhost:8080/api/posts/allFollowing?username=${username}`, {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     'Authorization': `Bearer ${token}`, 
+    //                 }
+    //             });*/
+    //             if (!response.ok) throw new Error('Failed to fetch posts');
+    //             const data = await response.json();
     
                 
-                // Sort and map posts to include isLiked based on likesList
-                const sortedPosts = data
-                    .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
-                    .map(post => {
-                        const isLiked = post.likesList?.some(like => like.user.username === username);
-                        console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
-                        const isFollowed = post.user.followers?.some(follower => follower === username) ?? false;
-                        post.user.followers.forEach(follower => {
-                            console.log(`Follower username: ${follower}`);
-                        });
-                        return {
-                            ...post,
-                            isLiked,
-                            isFollowed
-                            };
-                    });
+    //             // Sort and map posts to include isLiked based on likesList
+    //             const sortedPosts = data
+    //                 .sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime))
+    //                 .map(post => {
+    //                     const isLiked = post.likesList?.some(like => like.user.username === username);
+    //                     console.log(`Post ID: ${post.id}, isLiked by ${username}: ${isLiked}`);
+    //                     const isFollowed = post.user.followers?.some(follower => follower === username) ?? false;
+    //                     post.user.followers.forEach(follower => {
+    //                         console.log(`Follower username: ${follower}`);
+    //                     });
+    //                     return {
+    //                         ...post,
+    //                         isLiked,
+    //                         isFollowed
+    //                         };
+    //                 });
     
-                setPosts(sortedPosts); 
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
-        }
+    //             setPosts(sortedPosts); 
+    //         } catch (error) {
+    //             console.error("Error fetching posts:", error);
+    //         }
+    //     }
     
-        fetchPosts();
-    }, [token, username]);
+    //     fetchPosts();
+    // }, [token, username]);
+
+
+    useEffect(() => {
+  async function fetchPosts() {
+    try {
+      // 1. Učitaj sve postove
+      const response = await fetch("http://localhost:8080/api/posts/all", {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Failed to fetch posts');
+      const posts = await response.json();
+
+      const postIds = posts.map(post => post.id);
+
+      
+      const pluResponse = await fetch("http://localhost:8080/api/post-like-users/all", {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const postLikeUsers = pluResponse.ok ? await pluResponse.json() : [];
+
+      // 4. Mapiraj postove sa dodatnim informacijama
+      const enrichedPosts = posts.map(post => {
+        const isLiked = postLikeUsers.some(like => like.post.id === post.id && like.username === username);
+        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+        const likeCount = post.likes;
+        return {
+          ...post,
+          isLiked,
+          isFollowed,
+          likeCount,
+        };
+      });
+
+      // 5. Sortiraj po datumu kreiranja (najnoviji prvi)
+      enrichedPosts.sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime));
+
+      setPosts(enrichedPosts);
+
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  }
+
+  fetchPosts();
+}, [token, username]);
+
+
+
+
     
     async function followUser(user){
         try {

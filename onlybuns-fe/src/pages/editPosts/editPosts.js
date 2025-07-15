@@ -21,16 +21,34 @@ function EditPost() {
   const [description, setDescription] = useState(post?.description || '');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(post?.image ? `data:image/png;base64,${post.image.imageBase64}` : rabbitPreview);
-  const [coordinates, setCoordinates] = useState(post?.location?.coordinates || null);
-  const [locationInfo, setLocationInfo] = useState({
-    city: post?.location?.city || '',
-    country: post?.location?.country || '',
-    street: post?.location?.street || '',
-  });
+  //const [coordinates, setCoordinates] = useState(post?.location?.coordinates || null);
+  // const [locationInfo, setLocationInfo] = useState({
+  //   city: post?.location?.city || '',
+  //   country: post?.location?.country || '',
+  //   street: post?.location?.street || '',
+  // });
+  const initialCoordinates = (post?.location?.latitude && post?.location?.longitude)
+  ? { lat: post.location.latitude, lng: post.location.longitude }
+  : null;
+
+  const [coordinates, setCoordinates] = useState(initialCoordinates);
+
 
   const { user, token } = useUser();
 
+
+   useEffect(() => {
+    if (coordinates) {
+      console.log("Trenutne koordinate:");
+      console.log("Latitude:", coordinates.lat);
+      console.log("Longitude:", coordinates.lng);
+    }
+  }, [coordinates]);
+
+
   if (!user) return null;
+
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -43,13 +61,17 @@ function EditPost() {
     e.preventDefault();
     const formData = new FormData();
     formData.append('description', description);
-    if (image) formData.append('image', image); // Only append image if a new one is selected
-    formData.append('city', locationInfo.city);
-    formData.append('country', locationInfo.country);
-    formData.append('street', locationInfo.street);
+    if (image) formData.append('image', image);
+    if (coordinates) {
+    formData.append('latitude', coordinates.lat);
+    formData.append('longitude', coordinates.lng);
+  } // Only append image if a new one is selected
+    // formData.append('city', locationInfo.city);
+    // formData.append('country', locationInfo.country);
+    // formData.append('street', locationInfo.street);
     formData.append('email', user.email);
 
-    const url = `http://localhost:8080/api/posts/update/${post.id}`;
+    const url = `http://localhost:8080/api/post/update/${post.id}`;
     const method = 'PUT';
     fetch(url, {
       method,
@@ -65,31 +87,40 @@ function EditPost() {
           setDescription('');
           setImage(null);
           setImagePreview(rabbitPreview);
-          setLocationInfo({ city: '', country: '', street: '' });
+          // setLocationInfo({ city: '', country: '', street: '' });
         }
       })
       .catch((error) => console.error('Error saving post:', error));
   };
 
-  const fetchLocation = async (lat, lng) => {
-    const apiKey = 'f915ad90ad804f96aaea9b30c818d1ab';
-    const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`);
-    const data = await response.json();
-    if (data.results.length > 0) {
-      const components = data.results[0].components;
-      setCoordinates({ lat, lng });
-      setLocationInfo({
-        city: components.city || components.town || components.village || '',
-        country: components.country || '',
-        street: components.road || ''
-      });
-    }
-  };
+  // const fetchLocation = async (lat, lng) => {
+  //   const apiKey = 'f915ad90ad804f96aaea9b30c818d1ab';
+  //   const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`);
+  //   const data = await response.json();
+  //   if (data.results.length > 0) {
+  //     const components = data.results[0].components;
+  //     setCoordinates({ lat, lng });
+  //     setLocationInfo({
+  //       city: components.city || components.town || components.village || '',
+  //       country: components.country || '',
+  //       street: components.road || ''
+  //     });
+  //   }
+  // };
 
+  // function LocationMarker() {
+  //   useMapEvents({
+  //     click(e) {
+  //       fetchLocation(e.latlng.lat, e.latlng.lng);
+  //     },
+  //   });
+
+  //   return coordinates ? <Marker position={[coordinates.lat, coordinates.lng]}></Marker> : null;
+  // }
   function LocationMarker() {
     useMapEvents({
       click(e) {
-        fetchLocation(e.latlng.lat, e.latlng.lng);
+        setCoordinates({ lat: e.latlng.lat, lng: e.latlng.lng });
       },
     });
 
@@ -134,6 +165,7 @@ function EditPost() {
           <LocationMarker />
         </MapContainer>
       </div>
+    
       <button type="submit" className="submit-button-for-post">
         {post ? 'Update Post' : 'Create Post'}
       </button>
