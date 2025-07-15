@@ -208,10 +208,11 @@ async function fetchLikeCounts(postIds, token) {
     useEffect(() => {
     async function fetchPosts() {
         try {
-            const response = await fetch("http://localhost:8080/api/posts/all", {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
+             const response = await fetch(`http://localhost:8080/api/posts/allFollowing?username=${username}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                    }
             });
             if (!response.ok) throw new Error('Failed to fetch posts');
             const posts = await response.json();
