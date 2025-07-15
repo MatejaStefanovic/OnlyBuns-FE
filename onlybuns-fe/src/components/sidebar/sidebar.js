@@ -18,6 +18,7 @@ const SideBar = () => {
             <div className="menu-item"><Link className="menu-item" to="/nearMe">BUNNIES NEAR ME</Link></div>
             <div className="menu-item"><Link className="menu-item" to="/inbox">INBOX</Link></div>
             <div className="menu-item"><Link className="menu-item" to="/trends">TRENDS</Link></div>
+            <div className="menu-item"><Link className="menu-item" to="/map">MAP</Link></div>
             {user.role === "ADMIN" && (
                   <div className="menu-item"><Link className="menu-item" to="/analytics">ANALYTICS</Link></div>
             )}
