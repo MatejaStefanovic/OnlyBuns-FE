@@ -159,7 +159,7 @@ function HomePage() {
       // 4. Mapiraj postove sa dodatnim informacijama
       const enrichedPosts = posts.map(post => {
         const isLiked = postLikeUsers.some(like => like.post.id === post.id && like.username === username);
-        const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+        const isFollowed = post.user.followers?.some(follower => follower === username) ?? false;
         const likeCount = post.likes;
         return {
           ...post,

@@ -224,7 +224,7 @@ async function fetchLikeCounts(postIds, token) {
                 const isLiked = postLikeUsers.some(
                     like => like.post.id === post.id && like.username === username
                 );
-                const isFollowed = post.user.followers?.some(follower => follower.username === username) ?? false;
+                 const isFollowed = post.user.followers?.some(follower => follower === username) ?? false;
                 //const likeCount = likeCountMap.get(post.id) ?? 0;
                 const likeCount = likeCountMap.get(post.id) ?? 0;
                 return {
