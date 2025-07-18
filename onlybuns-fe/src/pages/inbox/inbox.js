@@ -20,8 +20,9 @@ function InboxPage() {
   const subscriptionRef = useRef(null);
   const [chatMessages, setChatMessages] = useState({}); 
   const [memberss, setMemberss] = useState([]); 
-  const[memberAdding, setMemberAdding] = useState (false);
+  const[memberEditing, setMemberEditing] = useState (false);
   const[seeMembers, setSeeMembers] = useState (false);
+  const[memberAdding, setMemberAdding] = useState (false);
   const [messageStatus, setMessageStatus] = useState('');
   const [selectedGroupName, setSelectedGroupName] = useState('');
   const [flagGroupChat, setFlagGroupChat] = useState(false);
@@ -30,6 +31,7 @@ function InboxPage() {
   const [groupChatMess, setGroupChatMess] = useState(false);
   const { user, token } = useUser();  
   const username = user ?.username;
+  const role = user?.role;
   const [groupMembers, setGroupMembers] = useState([]); 
   const [groups, setGroups] = useState([]); 
   const [selectedFriend, setSelectedFriend] = useState('');
@@ -45,6 +47,7 @@ function InboxPage() {
 
   
 
+  
   ///metoda kojom dobavljam sve one koje moj user prati
 useEffect(() => {
     fetch(`http://localhost:8080/api/users/following?username=${user.username}`)
@@ -96,9 +99,14 @@ useEffect(() => {
     setSelectedGroupName('');
     setGroupMembers([]);
   }
-
   function seeMembersFunc(){
     setSeeMembers(!seeMembers);
+    setMemberAdding(false);
+    setMemberEditing(false);
+    seeMembersFun();
+  }
+
+  function seeMembersFun(){   
     fetch(`http://localhost:8080/api/mess/getGroupMembers?groupId=${selectedGroup.id}`, {
       method: "GET",
     })
@@ -230,30 +238,53 @@ useEffect(() => {
     }
   }, [chats]); 
 
-
-  ///dodavanje clana u grupu 
-  function addMember(){
-    fetch(`http://localhost:8080/api/mess/addMember?username=${friend}&groupId=${selectedGroup.id}`)
+  ///uklanjanje clana iz grupu 
+  function removeMember(){
+    fetch(`http://localhost:8080/api/mess/deleteMember?username=${friend}&groupId=${selectedGroup.id}&adminUsername=${username}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setMemberAdding(false);
       setFriend('');
+      seeMembersFunc();
+      return response.json();
+    })
+    .catch((error) => console.error("Error removing member from group:", error));
+  }
+
+function openMemberEditing(){
+    setMemberEditing(!memberEditing);
+    setSeeMembers(false);
+    setMemberAdding(false);
+  }
+  function setaddMember(){
+    setMemberAdding(true);
+    setMemberEditing(false);
+  }
+  function closeeditMember(){
+    setMemberEditing(false);
+    setFriend('');
+  }
+  function closeaddMember(){
+    setMemberAdding(false);
+    setMemberEditing(true);
+    setFriend('');
+  }
+
+  ///dodavanje clana u grupu 
+  function addMember(){
+    fetch(`http://localhost:8080/api/mess/addMember?username=${friend}&groupId=${selectedGroup.id}&adminUsername=${username}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setFriend('');
+      seeMembersFunc();
       return response.json();
     })
     .catch((error) => console.error("Error adding new member to group:", error));
   }
 
-  function closeaddMember(){
-    setMemberAdding(false);
-    setFriend('');
-  }
-
-  //otvori prozor za dodavanje clana
-  function openMemberAdding(){
-    setMemberAdding(true);
-  }
   ///konekcija sa web socketom
   useEffect(() => {
     const socket = new SockJS("http://localhost:8080/socket");
@@ -376,6 +407,9 @@ useEffect(() => {
 
    ///metoda kojom otvaram izabrani cet
   function OpenChat(chat){
+    setMemberEditing(false);
+    setSeeMembers(false); 
+    setMemberAdding(false)
     setSelectedMssg('');
     setChatOpen(true);
     setChatSelected(chat);
@@ -616,21 +650,28 @@ return (
             ))}
 
     </div> )}
-    { selectedGroup && ( <span className={styles.chatWindow1}>Chat with {selectedGroup.groupName} <button  onClick={openMemberAdding}>add</button> <button onClick={seeMembersFunc}>see members</button></span> )}
-    {seeMembers && <div className={styles.membersList}>
-      <button onClick={seeMembersFunc}> X</button>
-      {memberss.map((memberr) => 
-      <p>{memberr}</p>
-      )}
-
-    </div> }
+    { selectedGroup && ( <span className={styles.chatWindow1}>Chat with {selectedGroup.groupName} {selectedGroup.admin==username && ( <button  onClick={openMemberEditing}>edit members</button> )} <button onClick={seeMembersFunc}>see members</button></span> )}
+    {seeMembers && (
+  <div>
+    <select className={styles.friendSelect}>
+      <option value="">Members</option>
+      {memberss
+        .filter(member => member && member.trim() !== "")
+        .map((member, index) => (
+          <option key={index} value={member}>
+            {member}
+          </option>
+        ))}
+    </select> <button onClick={seeMembersFunc}>Cancel</button> 
+  </div>
+)}
     {memberAdding && <div> <select
             id="friend-select"
             value={friend}
             onChange={(e) => setFriend(e.target.value)}
             className={styles.friendSelect}
           >
-            <option value="">Select a friend</option>
+            <option value="">Select a Friend</option>
             {friends
         .filter(friend => 
           !selectedGroup.members.some(member => member.memberUsername === friend)
@@ -639,6 +680,21 @@ return (
           <option key={index} value={friend}>{friend}</option>
         ))}
           </select> <button onClick={addMember}>Add</button> <button onClick={closeaddMember}>Cancel</button></div>}
+
+    {memberEditing && <div> <select
+            id="friend-select"
+            value={friend}
+            onChange={(e) => setFriend(e.target.value)}
+            className={styles.friendSelect}
+          >
+            <option value="">Select a Member</option>
+            {memberss
+        .filter(friend => friend && friend.trim() !== ""
+        )
+        .map((friend, index) => (
+          <option key={index} value={friend}>{friend}</option>
+        ))}
+          </select> <button onClick={setaddMember}>Add</button> <button onClick={removeMember}>Remove</button> <button onClick={closeeditMember}>Cancel</button></div>}
     { selectedGroup && (
     <div className={styles.chatWindow}>
       
