@@ -19,6 +19,8 @@ const MapPage = () => {
         street: '',
     });
 
+    const [messages, setMessages] = useState([]);
+
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState('');
 
@@ -86,7 +88,7 @@ const MapPage = () => {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:8080/api/post/userPosts?email=${user.email}`, {
+            const response = await fetch(`http://localhost:8080/api/post`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -97,7 +99,6 @@ const MapPage = () => {
 
             const data = await response.json();
 
-            // 🔁 Geocode each post with an address
             const postsWithCoordinates = await Promise.all(
                 data.map(async (post) => {
                     if (post.lat && post.lng) return post; // already has coords
@@ -114,6 +115,96 @@ const MapPage = () => {
             setError(err.message);
         }
     };
+
+    const fetchMessages = async () => {
+        try {
+            const response = await fetch('http://localhost:8081/messages?targetId=onlybuns&senderId=rabbitCare&queueId=RCOB');
+            if (!response.ok) throw new Error('Failed to fetch messages');
+            
+            const data = await response.json();
+            
+            if (data.status && data.messages && data.messages.length > 0) {
+                console.log('New messages received:', data.messages);
+                
+                const processedMessages = await Promise.all(
+                    data.messages.map(async (message) => {
+                        const parsedData = JSON.parse(message.data);
+                        return processMessage(parsedData);
+                    })
+                );
+                
+                return processedMessages.filter(msg => msg !== null);
+            }
+            
+            if (data.messages && data.messages.length === 0) {
+                console.log("No messages");
+            }
+            
+            return [];
+            
+        } catch (error) {
+            console.error('Error fetching messages:', error.message);
+            return [];
+        }
+    };
+
+    const processMessage = async (message) => {
+        try {
+            const coordinates = await getCoordinatesFromAddress(message.location);
+            
+            if (!coordinates) {
+                console.error('Could not get coordinates for message:', message);
+                return null; // Return null instead of undefined
+            }
+            const newMessage = {
+                lat: coordinates.lat,
+                lng: coordinates.lng,
+                type: message.type,
+                location: message.location
+            };
+
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+            console.log(messages);
+            return newMessage;
+            
+        } catch (error) {
+            console.error('Error processing message:', error);
+            return null;
+        }
+    };
+
+    let pollingInterval;
+
+    const startPolling = () => {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+
+        const poll = async () => {
+            await fetchMessages(); // fetchMessages now updates state internally
+        };
+
+        poll(); // initial fetch
+
+        pollingInterval = setInterval(poll, 5000);
+
+        console.log('Message polling started - checking every 5 seconds');
+    };
+
+    const stopPolling = () => {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+            console.log('Message polling stopped');
+        }
+    };
+
+    useEffect(() => {
+        startPolling();
+
+        return () => clearInterval(pollingInterval);
+    }, []);
+
 
     const getCoordinatesFromAddress = async (location) => {
         if (!location || !location.city || !location.country) {
@@ -199,14 +290,39 @@ const MapPage = () => {
                 if (coords) {
                     setCoordinates(coords);
                 }
-            });
+    });
         }
     }, [user]);
     
     useEffect(() => {
         fetchPosts();
     }, [user, token]);
-    
+   
+    const MessageMarkers = ({ messages = [] }) => {
+        return (
+            <>
+                {messages.map((message, index) => {
+                    const icon = message.type === 'vet' ? VetIcon : ShelterIcon;
+                    
+                    return (
+                        <Marker key={index} position={[message.lat, message.lng]} icon={icon}>
+                            <Popup>
+                                <div> 
+                                    <p>
+                                        Type: <strong>{message.type}</strong><br />
+                                        Street: {message.location.street} <br />
+                                        City: {message.location.city} <br />
+                                        Country: {message.location.country}
+                                    </p>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    );
+                })}
+            </>
+        );
+    };
+
     return (
         <div style={{ width: '100%', height: '100vh' }}>
             {coordinates ? (
@@ -221,6 +337,7 @@ const MapPage = () => {
                     />
                     <UserMarker/>
                     <PostMarkers posts={posts} icon={PostIcon} />
+                    <MessageMarkers messages={messages} />
                 </MapContainer>
             ) : (
                 <p>Loading map...</p>
