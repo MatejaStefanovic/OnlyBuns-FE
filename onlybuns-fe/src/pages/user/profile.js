@@ -60,12 +60,12 @@ const ProfilePage = () => {
   }, [contextUser, username, navigate]);
 
   useEffect(() => {
-    if (userr) {
+    if (user) {
       setIsFollowed(
-        userr?.followers?.some((follower) => contextUser.username === follower.username)
+        user?.followers?.some((follower) => contextUser.username === follower)
       );
     }
-  }, [userr, contextUser.username]);
+  }, [user, contextUser.username]);
 
   useEffect(() => {
     const fetchPosts = async () => {
