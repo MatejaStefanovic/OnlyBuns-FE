@@ -69,7 +69,10 @@ function HomePage() {
             
                                  ? {
                                      ...post,
-                                    comments: [...post.comments, { description: commentText, user: { username } }],
+                                    comments: [
+                          ...post.comments,
+                          { description: commentText, user: { username }, creationDateTime: new Date().toISOString() },
+                        ].sort((a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime)),
                                  }
                                  : post
         ));
@@ -288,12 +291,15 @@ function HomePage() {
           const updatedPost = await response.json();
       
           // Proveri da li je korisnik lajkovao post
-        const isLiked = updatedPost.likesList.some(like => like.user.username === username);
+          // const isLiked = updatedPost.likesList.some(like => like.user.username === username);
+      
+          // Proveri da li je korisnik lajkovao post
+        const isLiked = updatedPost === 1;
       
           // Ažuriraj stanje sa ispravnom vrednošću `isLiked`
           setPosts(posts.map(p => 
             p.id === postId 
-              ? { ...updatedPost, isLiked } // Dodaj `isLiked` bazirano na `likesList`
+              ? { ...post, isLiked, likeCount: isLiked? p.likeCount +1 : p.likeCount - 1 } // Dodaj `isLiked` bazirano na `likesList`
               : p
           ));
         } catch (error) {
@@ -304,11 +310,26 @@ function HomePage() {
       
     
 
-    function toggleComments(postId) {
-        setPosts(posts.map(post =>
+    // function toggleComments(postId) {
+    //     setPosts(posts.map(post =>
 
-            post.id === postId ? { ...post, showComments: !post.showComments } : post
-        ));
+    //         post.id === postId ? { ...post, showComments: !post.showComments } : post
+    //     ));
+    // }
+    function toggleComments(postId) {
+        setPosts(
+            posts.map((post) =>
+              post.id === postId
+                ? {
+                    ...post,
+                    showComments: !post.showComments,
+                    comments: [...post.comments].sort(
+                      (a, b) => new Date(b.creationDateTime) - new Date(a.creationDateTime) // Sortira najnovije na početak
+                    ),
+                  }
+                : post
+            )
+          );
     }
 
     return (
@@ -364,7 +385,7 @@ function HomePage() {
                             
                         <div className={styles.lajkovi}>
 
-                            <p>{post.likes}</p>
+                          <p>{post.likeCount}</p>
                             <div className={styles.lajk}>
                                 {user && (
                                     <img
@@ -390,10 +411,12 @@ function HomePage() {
                                     )}
 
                             </div>
-                            <div className={styles.com} onClick={() => toggleComments(post.id)}>
-                               
+                             <div className={styles.com} onClick={() => toggleComments(post.id)}>
+                                {user ? (
                                     <img src={comm} className={styles.coment} alt="Comment Icon" />
-                                 
+                                ) : (
+                                        <p></p>
+                                    )}
 
                             </div>
                             
